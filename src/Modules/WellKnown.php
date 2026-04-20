@@ -1,14 +1,14 @@
 <?php
 
-/** 
+/**
  * WellKnown
- * 
+ *
  * Registers and serves all /.well-known/* endpoints for agent discovery.
- * 
+ *
  * @since 1.0.0
  * @author Kevin Pirnie <me@kpirnie.com>
  * @package KP Agent Ready
- * 
+ *
  */
 
 // setup the namespace
@@ -30,12 +30,14 @@ defined('ABSPATH') || die('No direct script access allowed');
 class WellKnown extends AbstractModule
 {
 
+    /** Query var used to identify which endpoint to serve. */
     private const QUERY_VAR = 'kp_agent';
 
     /**
      * register
      *
-     * Attaches rewrite rule registration, query var, and dispatch hooks.
+     * Attaches rewrite rule registration, query var, and request
+     * interception hooks.
      *
      * @since 1.0.0
      * @access public
@@ -47,11 +49,9 @@ class WellKnown extends AbstractModule
      */
     public function register(): void
     {
-        add_action('init',              [__CLASS__, 'registerRules']);
-        add_filter('query_vars',        [$this, 'addQueryVar']);
-        add_action('template_redirect', [$this, 'dispatch'], 1);
-        add_filter('wpseo_whitelist_query_vars', [$this, 'addQueryVar']);
-        add_filter('redirect_canonical', [$this, 'preventCanonicalRedirect']);
+        add_action('init',       [__CLASS__, 'registerRules']);
+        add_filter('query_vars', [$this, 'addQueryVar']);
+        add_action('wp_loaded',  [$this, 'interceptRequest'], PHP_INT_MIN);
     }
 
     /**
@@ -101,17 +101,23 @@ class WellKnown extends AbstractModule
      */
     public function addQueryVar(array $vars): array
     {
-        $vars[] = self::QUERY_VAR;
+        // Handles both WordPress query_vars (indexed) and Yoast allow list (associative)
+        if (array_is_list($vars)) {
+            $vars[] = self::QUERY_VAR;
+        } else {
+            $vars[self::QUERY_VAR] = true;
+        }
         return $vars;
     }
 
     /**
-     * dispatch
+     * interceptRequest
      *
-     * Reads the kp_agent query var and routes to the appropriate
-     * endpoint handler. No-ops if the var is not set.
+     * Fires on wp_loaded before WordPress processes the query. Reads
+     * REQUEST_URI directly and serves the matching well-known endpoint
+     * using raw PHP headers so no WordPress redirect logic can interfere.
      *
-     * @since 1.0.0
+     * @since 1.1.0
      * @access public
      * @author Kevin Pirnie <iam@kevinpirnie.com>
      * @package KP Agent Ready
@@ -119,10 +125,13 @@ class WellKnown extends AbstractModule
      * @return void This method does not return anything
      *
      */
-    public function dispatch(): void
+    public function interceptRequest(): void
     {
-        $ep = get_query_var(self::QUERY_VAR);
-        if (! $ep) return;
+        $ep = sanitize_key($_GET['kp_agent'] ?? '');
+
+        if (! $ep) {
+            return;
+        }
 
         match ($ep) {
             'api-catalog'     => $this->serveApiCatalog(),
@@ -133,31 +142,6 @@ class WellKnown extends AbstractModule
             'oauth-resource'  => $this->serveOauthResource(),
             default           => null,
         };
-    }
-
-    /**
-     * preventCanonicalRedirect
-     *
-     * Prevents WordPress canonical redirects from firing on
-     * well-known endpoint requests, which have no canonical URL.
-     *
-     * @since 1.1.0
-     * @access public
-     * @author Kevin Pirnie <iam@kevinpirnie.com>
-     * @package KP Agent Ready
-     *
-     * @param string $redirect_url The URL WordPress wants to redirect to
-     *
-     * @return string|false The redirect URL or false to cancel the redirect
-     *
-     */
-    public function preventCanonicalRedirect(string $redirect_url): string|false
-    {
-        if (get_query_var(self::QUERY_VAR)) {
-            return false;
-        }
-
-        return $redirect_url;
     }
 
     /**
@@ -189,6 +173,7 @@ class WellKnown extends AbstractModule
             if (! empty($row['service_desc'])) {
                 $item['service-desc'] = [['href' => $row['service_desc']]];
             }
+
             // page_select overrides the manual URL when a page is chosen
             $service_doc = ! empty($row['service_doc_page'])
                 ? get_permalink((int) $row['service_doc_page'])
@@ -197,6 +182,7 @@ class WellKnown extends AbstractModule
             if ($service_doc) {
                 $item['service-doc'] = [['href' => $service_doc]];
             }
+
             if (! empty($row['status'])) {
                 $item['status'] = [['href' => $row['status']]];
             }
@@ -269,12 +255,12 @@ class WellKnown extends AbstractModule
 
         $payload = [
             'serverInfo'   => [
-                'name'    => $this->opt('mcp_name',    'kevinpirnie.com'),
+                'name'    => $this->opt('mcp_name',    get_bloginfo('name')),
                 'version' => $this->opt('mcp_version', '1.0.0'),
             ],
             'transport'    => $this->opt('mcp_transport', null) ?: null,
             'capabilities' => $capabilities,
-            'description'  => $this->opt('mcp_desc', 'Personal portfolio and blog of Kevin Pirnie — WordPress Developer & DevOps Engineer.'),
+            'description'  => $this->opt('mcp_desc', get_bloginfo('description')),
             'homepage'     => home_url('/'),
             'contact'      => home_url('/contact/'),
         ];
@@ -299,7 +285,7 @@ class WellKnown extends AbstractModule
     private function serveOidcConfig(): never
     {
         if (! $this->opt('oauth_enabled', false) || $this->opt('oauth_type', 'oidc') !== 'oidc') {
-            status_header(404);
+            http_response_code(404);
             exit;
         }
 
@@ -323,7 +309,7 @@ class WellKnown extends AbstractModule
     private function serveOauthConfig(): never
     {
         if (! $this->opt('oauth_enabled', false) || $this->opt('oauth_type', 'oidc') !== 'oauth2') {
-            status_header(404);
+            http_response_code(404);
             exit;
         }
 
@@ -347,7 +333,7 @@ class WellKnown extends AbstractModule
     private function serveOauthResource(): never
     {
         if (! $this->opt('opr_enabled', false)) {
-            status_header(404);
+            http_response_code(404);
             exit;
         }
 
@@ -368,9 +354,9 @@ class WellKnown extends AbstractModule
         $bearer_methods = array_values(array_filter((array) $this->opt('opr_bearer_methods', [])));
 
         $payload = array_filter([
-            'resource'                => $this->opt('opr_resource', home_url('/')),
-            'authorization_servers'   => array_values($auth_servers),
-            'scopes_supported'        => array_values($scopes),
+            'resource'                 => $this->opt('opr_resource', home_url('/')),
+            'authorization_servers'    => array_values($auth_servers),
+            'scopes_supported'         => array_values($scopes),
             'bearer_methods_supported' => $bearer_methods ?: null,
         ]);
 
@@ -406,9 +392,9 @@ class WellKnown extends AbstractModule
 
         return array_filter([
             'issuer'                                => $this->opt('oauth_issuer', home_url('/')),
-            'authorization_endpoint'                => $this->opt('oauth_auth_endpoint')    ?: null,
-            'token_endpoint'                        => $this->opt('oauth_token_endpoint')   ?: null,
-            'jwks_uri'                              => $this->opt('oauth_jwks_uri')          ?: null,
+            'authorization_endpoint'                => $this->opt('oauth_auth_endpoint')  ?: null,
+            'token_endpoint'                        => $this->opt('oauth_token_endpoint') ?: null,
+            'jwks_uri'                              => $this->opt('oauth_jwks_uri')        ?: null,
             'grant_types_supported'                 => $grant_types    ?: null,
             'response_types_supported'              => $response_types ?: null,
             'scopes_supported'                      => array_values($scopes) ?: null,
@@ -432,19 +418,20 @@ class WellKnown extends AbstractModule
      */
     private function buildSkills(): array
     {
-        $skills = [];
+        $skills    = [];
+        $site_name = get_bloginfo('name');
 
         if ($this->opt('skill_blog_enabled', true)) {
             $skills[] = [
                 'name'        => 'blog-search',
                 'type'        => 'search',
-                'description' => 'Search Kevin Pirnie\'s blog articles on WordPress, DevOps, and web development.',
+                'description' => sprintf('Search %s blog articles.', $site_name),
                 'url'         => home_url('/?s={query}'),
             ];
             $skills[] = [
                 'name'        => 'blog-articles',
                 'type'        => 'browse',
-                'description' => 'Browse all blog articles published on kevinpirnie.com.',
+                'description' => sprintf('Browse all blog articles published on %s.', home_url()),
                 'url'         => home_url('/blog/'),
             ];
         }
@@ -457,7 +444,7 @@ class WellKnown extends AbstractModule
             $skills[] = [
                 'name'        => sanitize_title($post_type),
                 'type'        => 'browse',
-                'description' => sprintf('Browse %s on kevinpirnie.com.', strtolower($obj->label)),
+                'description' => sprintf('Browse %s on %s.', strtolower($obj->label), home_url()),
                 'url'         => $archive ?: home_url("/?post_type={$post_type}"),
             ];
         }
@@ -492,7 +479,9 @@ class WellKnown extends AbstractModule
     /**
      * respond
      *
-     * Emits a JSON response with the appropriate Content-Type header and exits.
+     * Emits a JSON response using raw PHP headers and exits. Raw headers
+     * are used intentionally so that no WordPress redirect logic can
+     * intercept or override the response.
      *
      * @since 1.0.0
      * @access private
@@ -507,10 +496,12 @@ class WellKnown extends AbstractModule
      */
     private function respond(array $payload, string $content_type = 'application/json'): never
     {
-        status_header(200);
+        // Raw PHP headers — intentionally bypassing WordPress header functions
+        http_response_code(200);
         header("Content-Type: {$content_type}; charset=UTF-8");
         header('Cache-Control: public, max-age=3600');
-        echo wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        header('X-Robots-Tag: noindex');
+        echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         exit;
     }
 }

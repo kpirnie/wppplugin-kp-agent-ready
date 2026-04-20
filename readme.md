@@ -13,7 +13,7 @@
 * **Requires at least:** 6.8
 * **Tested up to:** 7.0
 * **Requires PHP:** 8.2
-* **Stable tag:** 1.0.76
+* **Stable tag:** 1.1.03
 * **License:** MIT
 * **License URI:** https://opensource.org/licenses/MIT
 

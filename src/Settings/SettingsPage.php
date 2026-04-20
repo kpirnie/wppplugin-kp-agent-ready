@@ -1,7 +1,19 @@
 <?php
 
-namespace KP\AgentReady\Settings;
+/** 
+ * SettingsPage
+ * 
+ * Registers the plugin's tabbed admin settings page using KPT WP Field Framework.
+ * All settings are stored under the option key defined in Plugin::OPTION_KEY.
+ * 
+ * @since 1.0.0
+ * @author Kevin Pirnie <me@kpirnie.com>
+ * @package KP Agent Ready
+ * 
+ */
 
+// setup the namespace
+namespace KP\AgentReady\Settings;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');

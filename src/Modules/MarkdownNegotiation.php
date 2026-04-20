@@ -19,6 +19,7 @@ namespace KP\AgentReady\Modules;
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
 
+// pull in the namespace
 use KP\AgentReady\Helpers\HtmlToMarkdown;
 
 /**
@@ -71,23 +72,30 @@ class MarkdownNegotiation extends AbstractModule
      */
     public function maybeServe(): void
     {
+        // make sure we have this enabled, and we're on a single post
         if (! $this->opt('markdown_enabled', true)) return;
         if (! is_singular()) return;
 
+        // 
         $accept = sanitize_text_field(wp_unslash($_SERVER['HTTP_ACCEPT'] ?? ''));
         if (! str_contains($accept, 'text/markdown')) return;
 
+        // setup the post
         global $post;
         setup_postdata($post);
 
+        // setup the relevant post data
         $title   = get_the_title($post);
         $url     = get_permalink($post);
         $content = apply_filters('the_content', $post->post_content);
         $md      = HtmlToMarkdown::convert($content);
 
+        // setup the return markdown content
         status_header(200);
         header('Content-Type: text/markdown; charset=UTF-8');
         header('Vary: Accept');
+
+        // echo out the converted content, then exit so nothing further is output
         // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo "# {$title}\n\n> {$url}\n\n{$md}";
         exit;

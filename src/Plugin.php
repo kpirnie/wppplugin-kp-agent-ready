@@ -69,6 +69,7 @@ final class Plugin
      */
     public static function instance(): self
     {
+        // if the plugin classes are not already existing, set it up
         if (null === self::$instance) {
             self::$instance = new self();
         }
@@ -90,15 +91,18 @@ final class Plugin
      */
     private function bootstrap(): void
     {
+        // if we're in the admin
         if (is_admin()) {
             (new SettingsPage($this->options))->register();
         }
 
+        // fire up the modules
         (new LinkHeaders($this->options))->register();
         (new RobotsTxt($this->options))->register();
         (new WellKnown($this->options))->register();
         (new MarkdownNegotiation($this->options))->register();
         (new WebMCP($this->options))->register();
+        (new Updater())->register();
     }
 
     /**
@@ -116,7 +120,10 @@ final class Plugin
      */
     public static function activate(): void
     {
+        // register the rewwrite rules for the .well-known locations we'll need to inject
         WellKnown::registerRules();
+
+        // flush the rewrites
         flush_rewrite_rules();
     }
 

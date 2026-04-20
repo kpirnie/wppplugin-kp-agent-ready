@@ -50,6 +50,8 @@ class WellKnown extends AbstractModule
         add_action('init',              [__CLASS__, 'registerRules']);
         add_filter('query_vars',        [$this, 'addQueryVar']);
         add_action('template_redirect', [$this, 'dispatch'], 1);
+        add_filter('wpseo_whitelist_query_vars', [$this, 'addQueryVar']);
+        add_filter('redirect_canonical', [$this, 'preventCanonicalRedirect']);
     }
 
     /**
@@ -131,6 +133,31 @@ class WellKnown extends AbstractModule
             'oauth-resource'  => $this->serveOauthResource(),
             default           => null,
         };
+    }
+
+    /**
+     * preventCanonicalRedirect
+     *
+     * Prevents WordPress canonical redirects from firing on
+     * well-known endpoint requests, which have no canonical URL.
+     *
+     * @since 1.1.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $redirect_url The URL WordPress wants to redirect to
+     *
+     * @return string|false The redirect URL or false to cancel the redirect
+     *
+     */
+    public function preventCanonicalRedirect(string $redirect_url): string|false
+    {
+        if (get_query_var(self::QUERY_VAR)) {
+            return false;
+        }
+
+        return $redirect_url;
     }
 
     /**

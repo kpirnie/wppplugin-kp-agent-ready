@@ -16,6 +16,7 @@ return array(
     'KP\\AgentReady\\Modules\\WellKnown' => $baseDir . '/src/Modules/WellKnown.php',
     'KP\\AgentReady\\Plugin' => $baseDir . '/src/Plugin.php',
     'KP\\AgentReady\\Settings\\SettingsPage' => $baseDir . '/src/Settings/SettingsPage.php',
+    'KP\\AgentReady\\Updater' => $baseDir . '/src/Updater.php',
     'KP\\WPFieldFramework\\BlockGenerator' => $vendorDir . '/kevinpirnie/kpt-wpfieldframework/src/BlockGenerator.php',
     'KP\\WPFieldFramework\\ExportImport' => $vendorDir . '/kevinpirnie/kpt-wpfieldframework/src/ExportImport.php',
     'KP\\WPFieldFramework\\FieldTypes' => $vendorDir . '/kevinpirnie/kpt-wpfieldframework/src/FieldTypes.php',

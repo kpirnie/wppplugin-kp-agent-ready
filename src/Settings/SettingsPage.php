@@ -18,8 +18,7 @@ namespace KP\AgentReady\Settings;
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
 
-
-
+// pull in our namespaces
 use KP\AgentReady\Plugin;
 use KP\WPFieldFramework\Loader;
 
@@ -113,6 +112,7 @@ class SettingsPage
      */
     private function buildConfig(): array
     {
+        // setup the default tabs
         $tabs = [
             'features'     => $this->tabFeatures(),
             'api_catalog'  => $this->tabApiCatalog(),
@@ -120,25 +120,24 @@ class SettingsPage
             'mcp_card'     => $this->tabMcpCard(),
         ];
 
+        // make sure they are enabled to pull them in
         if ($this->options['content_signals_enabled'] ?? true) {
             $tabs['content_signals'] = $this->tabContentSignals();
         }
-
         if ($this->options['oauth_enabled'] ?? false) {
             $tabs['oauth'] = $this->tabOAuth();
         }
-
         if ($this->options['opr_enabled'] ?? false) {
             $tabs['oauth_resource'] = $this->tabOAuthResource();
         }
-
         if ($this->options['webmcp_enabled'] ?? true) {
             $tabs['webmcp'] = $this->tabWebMcp();
         }
 
+        // return the full config
         return [
-            'page_title'         => 'Agent Ready',
-            'menu_title'         => 'Agent Ready',
+            'page_title'         => __('Agent Ready', 'kp-agent-ready'),
+            'menu_title'         => __('Agent Ready', 'kp-agent-ready'),
             'menu_slug'          => Plugin::OPTION_KEY,
             'icon_url'           => 'dashicons-superhero-alt',
             'position'           => 30,
@@ -163,29 +162,29 @@ class SettingsPage
      */
     public function registerSubmenus(): void
     {
+        // setup the default tabs
         $tabs = [
-            'features'     => 'Features',
-            'api_catalog'  => 'API Catalog',
-            'agent_skills' => 'Agent Skills',
-            'mcp_card'     => 'MCP Server Card',
+            'features'     => __('Features', 'kp-agent-ready'),
+            'api_catalog'  => __('API Catalog', 'kp-agent-ready'),
+            'agent_skills' => __('Agent Skills', 'kp-agent-ready'),
+            'mcp_card'     => __('MCP Server Card', 'kp-agent-ready'),
         ];
 
+        // make sure they are enabled
         if ($this->options['content_signals_enabled'] ?? true) {
-            $tabs['content_signals'] = 'Content Signals';
+            $tabs['content_signals'] = __('Content Signals', 'kp-agent-ready');
         }
-
         if ($this->options['oauth_enabled'] ?? false) {
-            $tabs['oauth'] = 'OAuth / OIDC';
+            $tabs['oauth'] = __('OAuth / OIDC', 'kp-agent-ready');
         }
-
         if ($this->options['opr_enabled'] ?? false) {
-            $tabs['oauth_resource'] = 'OAuth Resource';
+            $tabs['oauth_resource'] = __('OAuth Resource', 'kp-agent-ready');
         }
-
         if ($this->options['webmcp_enabled'] ?? true) {
-            $tabs['webmcp'] = 'WebMCP';
+            $tabs['webmcp'] = __('WebMCP', 'kp-agent-ready');
         }
 
+        // loop over the tabs and add them as submenu items
         foreach ($tabs as $tab => $label) {
             $url = add_query_arg('tab', $tab, 'admin.php?page=' . Plugin::OPTION_KEY);
             add_submenu_page(
@@ -213,52 +212,53 @@ class SettingsPage
      */
     private function tabFeatures(): array
     {
+        // setup the tabs settings
         return [
-            'title'    => 'Features',
+            'title'    => __('Features', 'kp-agent-ready'),
             'sections' => [
                 'toggles' => [
-                    'title'  => 'Feature Toggles',
+                    'title'  => __('Feature Toggles', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'             => 'link_headers_enabled',
                             'type'           => 'switch',
-                            'label'          => 'RFC 8288 Link Headers',
-                            'checkbox_label' => 'Send Link response headers for agent discovery',
+                            'label'          => __('RFC 8288 Link Headers', 'kp-agent-ready'),
+                            'checkbox_label' => __('Send Link response headers for agent discovery', 'kp-agent-ready'),
                             'default'        => true,
                         ],
                         [
                             'id'             => 'content_signals_enabled',
                             'type'           => 'switch',
-                            'label'          => 'Content Signals',
-                            'checkbox_label' => 'Append Content-Signal directives to robots.txt',
+                            'label'          => __('Content Signals', 'kp-agent-ready'),
+                            'checkbox_label' => __('Append Content-Signal directives to robots.txt', 'kp-agent-ready'),
                             'default'        => true,
                         ],
                         [
                             'id'             => 'markdown_enabled',
                             'type'           => 'switch',
-                            'label'          => 'Markdown Negotiation',
-                            'checkbox_label' => 'Serve text/markdown when requested via Accept header',
+                            'label'          => __('Markdown Negotiation', 'kp-agent-ready'),
+                            'checkbox_label' => __('Serve text/markdown when requested via Accept header', 'kp-agent-ready'),
                             'default'        => true,
                         ],
                         [
                             'id'             => 'webmcp_enabled',
                             'type'           => 'switch',
-                            'label'          => 'WebMCP',
-                            'checkbox_label' => 'Inject WebMCP tool definitions via navigator.modelContext',
+                            'label'          => __('WebMCP', 'kp-agent-ready'),
+                            'checkbox_label' => __('Inject WebMCP tool definitions via navigator.modelContext', 'kp-agent-ready'),
                             'default'        => true,
                         ],
                         [
                             'id'             => 'oauth_enabled',
                             'type'           => 'switch',
-                            'label'          => 'OAuth / OIDC Discovery',
-                            'checkbox_label' => 'Serve OAuth or OpenID Connect discovery metadata',
+                            'label'          => __('OAuth / OIDC Discovery', 'kp-agent-ready'),
+                            'checkbox_label' => __('Serve OAuth or OpenID Connect discovery metadata', 'kp-agent-ready'),
                             'default'        => false,
                         ],
                         [
                             'id'             => 'opr_enabled',
                             'type'           => 'switch',
-                            'label'          => 'OAuth Protected Resource',
-                            'checkbox_label' => 'Serve OAuth Protected Resource Metadata (RFC 9728)',
+                            'label'          => __('OAuth Protected Resource', 'kp-agent-ready'),
+                            'checkbox_label' => __('Serve OAuth Protected Resource Metadata (RFC 9728)', 'kp-agent-ready'),
                             'default'        => false,
                         ],
                     ],
@@ -282,54 +282,54 @@ class SettingsPage
      */
     private function tabApiCatalog(): array
     {
-        // Collect pages for the service-doc page selector
+        // setup the tabs settings
         return [
-            'title'    => 'API Catalog',
+            'title'    => __('API Catalog', 'kp-agent-ready'),
             'sections' => [
                 'entries' => [
-                    'title'       => 'Linkset Entries',
-                    'description' => 'Each entry is published in the <code>linkset</code> array at <code>/.well-known/api-catalog</code> (<a href="https://www.rfc-editor.org/rfc/rfc9727" target="_blank">RFC 9727</a>). Leave empty to use the auto-generated fallback.',
+                    'title'       => __('Linkset Entries', 'kp-agent-ready'),
+                    'description' => __('Each entry is published in the <code>linkset</code> array at <code>/.well-known/api-catalog</code> (<a href="https://www.rfc-editor.org/rfc/rfc9727" target="_blank">RFC 9727</a>). Leave empty to use the auto-generated fallback.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'api_catalog_entries',
                             'type'         => 'repeater',
-                            'label'        => 'Entries',
-                            'button_label' => 'Add Entry',
+                            'label'        => __('Entries', 'kp-agent-ready'),
+                            'button_label' => __('Add Entry', 'kp-agent-ready'),
                             'collapsed'    => true,
                             'sortable'     => true,
-                            'row_label'    => 'Entry',
+                            'row_label'    => __('Entry', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'          => 'anchor',
                                     'type'        => 'url',
-                                    'label'       => 'Anchor URL',
-                                    'sublabel'    => 'Base URL of the API this entry describes.',
+                                    'label'       => __('Anchor URL', 'kp-agent-ready'),
+                                    'sublabel'    => __('Base URL of the API this entry describes.', 'kp-agent-ready'),
                                     'placeholder' => home_url('/'),
                                     'required'    => true,
                                 ],
                                 [
                                     'id'          => 'service_desc',
                                     'type'        => 'url',
-                                    'label'       => 'service-desc (OpenAPI spec URL)',
-                                    'sublabel'    => 'Direct URL to the OpenAPI / Swagger specification file.',
+                                    'label'       => __('service-desc (OpenAPI spec URL)', 'kp-agent-ready'),
+                                    'sublabel'    => __('Direct URL to the OpenAPI / Swagger specification file.', 'kp-agent-ready'),
                                     'placeholder' => 'https://example.com/openapi.json',
                                 ],
                                 [
                                     'id'       => 'service_doc',
                                     'type'     => 'url',
-                                    'label'    => 'service-doc (Documentation URL)',
-                                    'sublabel' => 'Human-readable API documentation page.',
+                                    'label'    => __('service-doc (Documentation URL)', 'kp-agent-ready'),
+                                    'sublabel' => __('Human-readable API documentation page.', 'kp-agent-ready'),
                                 ],
                                 [
                                     'id'          => 'service_doc_page',
                                     'type'        => 'page_select',
-                                    'label'       => 'service-doc — or select a page',
-                                    'sublabel'    => 'Overrides the URL above if a page is selected.',
+                                    'label'       => __('service-doc — or select a page', 'kp-agent-ready'),
+                                    'sublabel'    => __('Overrides the URL above if a page is selected.', 'kp-agent-ready'),
                                 ],
                                 [
                                     'id'          => 'status',
                                     'type'        => 'url',
-                                    'label'       => 'status (Health endpoint URL)',
+                                    'label'       => __('status (Health endpoint URL)', 'kp-agent-ready'),
                                     'placeholder' => 'https://example.com/health',
                                 ],
                             ],
@@ -356,76 +356,77 @@ class SettingsPage
      */
     private function tabAgentSkills(): array
     {
+        // setup the tabs settings
         return [
-            'title'    => 'Agent Skills',
+            'title'    => __('Agent Skills', 'kp-agent-ready'),
             'sections' => [
                 'blog' => [
-                    'title'  => 'Blog / Articles',
+                    'title'  => __('Blog / Articles', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'             => 'skill_blog_enabled',
                             'type'           => 'switch',
-                            'label'          => 'Include Blog Articles',
-                            'checkbox_label' => 'Expose blog search and article listing as agent skills',
+                            'label'          => __('Include Blog Articles', 'kp-agent-ready'),
+                            'checkbox_label' => __('Expose blog search and article listing as agent skills', 'kp-agent-ready'),
                             'default'        => true,
                         ],
                     ],
                 ],
                 'cpts'          => $this->buildCptSection(),
                 'custom_skills' => [
-                    'title'       => 'Custom Skills',
-                    'description' => 'Manually define additional entries in the agent skills index.',
+                    'title'       => __('Custom Skills', 'kp-agent-ready'),
+                    'description' => __('Manually define additional entries in the agent skills index.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'skill_custom',
                             'type'         => 'repeater',
-                            'label'        => 'Custom Skills',
-                            'button_label' => 'Add Skill',
+                            'label'        => __('Custom Skills', 'kp-agent-ready'),
+                            'button_label' => __('Add Skill', 'kp-agent-ready'),
                             'collapsed'    => true,
                             'sortable'     => true,
-                            'row_label'    => 'Skill',
+                            'row_label'    => __('Skill', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'       => 'name',
                                     'type'     => 'text',
-                                    'label'    => 'Name',
+                                    'label'    => __('Name', 'kp-agent-ready'),
                                     'required' => true,
                                 ],
                                 [
                                     'id'      => 'type',
                                     'type'    => 'select',
-                                    'label'   => 'Type',
+                                    'label'   => __('Type', 'kp-agent-ready'),
                                     'options' => [
-                                        'browse' => 'Browse',
-                                        'search' => 'Search',
-                                        'form'   => 'Form',
-                                        'action' => 'Action',
-                                        'api'    => 'API',
+                                        'browse' => __('Browse', 'kp-agent-ready'),
+                                        'search' => __('Search', 'kp-agent-ready'),
+                                        'form'   => __('Form', 'kp-agent-ready'),
+                                        'action' => __('Action', 'kp-agent-ready'),
+                                        'api'    => __('API', 'kp-agent-ready'),
                                     ],
                                     'default' => 'browse',
                                 ],
                                 [
                                     'id'    => 'description',
                                     'type'  => 'textarea',
-                                    'label' => 'Description',
+                                    'label' => __('Description', 'kp-agent-ready'),
                                     'rows'  => 3,
                                 ],
                                 [
                                     'id'   => 'url',
                                     'type' => 'url',
-                                    'label' => 'URL',
+                                    'label' => __('URL', 'kp-agent-ready'),
                                 ],
                                 [
                                     'id'      => 'url_page',
                                     'type'    => 'page_select',
-                                    'label'   => 'Or select a page',
-                                    'sublabel' => 'Overrides the URL above if a page is selected.',
+                                    'label'   => __('Or select a page', 'kp-agent-ready'),
+                                    'sublabel' => __('Overrides the URL above if a page is selected.', 'kp-agent-ready'),
                                 ],
                                 [
                                     'id'       => 'sha256',
                                     'type'     => 'text',
-                                    'label'    => 'sha256 Digest',
-                                    'sublabel' => 'Optional. Hash of the skill file content per the Agent Skills RFC.',
+                                    'label'    => __('sha256 Digest', 'kp-agent-ready'),
+                                    'sublabel' => __('Optional. Hash of the skill file content per the Agent Skills RFC.', 'kp-agent-ready'),
                                 ],
                             ],
                         ],
@@ -451,36 +452,38 @@ class SettingsPage
      */
     private function tabContentSignals(): array
     {
-        $yes_no = ['yes' => 'Yes', 'no' => 'No'];
+        // yes? no?
+        $yes_no = ['yes' => __('Yes', 'kp-agent-ready'), 'no' => __('No', 'kp-agent-ready')];
 
+        // setup the tabs settings
         return [
-            'title'    => 'Content Signals',
+            'title'    => __('Content Signals', 'kp-agent-ready'),
             'sections' => [
                 'signals' => [
-                    'title'       => 'AI Usage Preferences',
-                    'description' => 'Declare AI content usage preferences published in <code>robots.txt</code> via the <a href="https://contentsignals.org/" target="_blank">Content Signals</a> spec.',
+                    'title'       => __('AI Usage Preferences', 'kp-agent-ready'),
+                    'description' => __('Declare AI content usage preferences published in <code>robots.txt</code> via the <a href="https://contentsignals.org/" target="_blank">Content Signals</a> spec.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'       => 'cs_ai_train',
                             'type'     => 'radio',
-                            'label'    => 'AI Training (ai-train)',
-                            'sublabel' => 'Allow this content to be used to train AI models.',
+                            'label'    => __('AI Training (ai-train)', 'kp-agent-ready'),
+                            'sublabel' => __('Allow this content to be used to train AI models.', 'kp-agent-ready'),
                             'options'  => $yes_no,
                             'default'  => 'no',
                         ],
                         [
                             'id'       => 'cs_search',
                             'type'     => 'radio',
-                            'label'    => 'Search Indexing (search)',
-                            'sublabel' => 'Allow this content to be indexed by search engines.',
+                            'label'    => __('Search Indexing (search)', 'kp-agent-ready'),
+                            'sublabel' => __('Allow this content to be indexed by search engines.', 'kp-agent-ready'),
                             'options'  => $yes_no,
                             'default'  => 'yes',
                         ],
                         [
                             'id'       => 'cs_ai_input',
                             'type'     => 'radio',
-                            'label'    => 'AI RAG Input (ai-input)',
-                            'sublabel' => 'Allow this content to be used as input to AI retrieval / RAG systems.',
+                            'label'    => __('AI RAG Input (ai-input)', 'kp-agent-ready'),
+                            'sublabel' => __('Allow this content to be used as input to AI retrieval / RAG systems.', 'kp-agent-ready'),
                             'options'  => $yes_no,
                             'default'  => 'no',
                         ],
@@ -506,57 +509,58 @@ class SettingsPage
      */
     private function tabMcpCard(): array
     {
+        // setup the tabs settings
         return [
-            'title'    => 'MCP Server Card',
+            'title'    => __('MCP Server Card', 'kp-agent-ready'),
             'sections' => [
                 'card' => [
-                    'title'       => 'Server Card Info',
-                    'description' => 'Configures <code>/.well-known/mcp/server-card.json</code> per <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127" target="_blank">SEP-1649</a>.',
+                    'title'       => __('Server Card Info', 'kp-agent-ready'),
+                    'description' => __('Configures <code>/.well-known/mcp/server-card.json</code> per <a href="https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127" target="_blank">SEP-1649</a>.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'      => 'mcp_name',
                             'type'    => 'text',
-                            'label'   => 'Server Name',
+                            'label'   => __('Server Name', 'kp-agent-ready'),
                             'default' => 'kevinpirnie.com',
                         ],
                         [
                             'id'      => 'mcp_version',
                             'type'    => 'text',
-                            'label'   => 'Version',
-                            'default' => '1.0.0',
+                            'label'   => __('Version', 'kp-agent-ready'),
+                            'default' => __('1.0.0', 'kp-agent-ready'),
                         ],
                         [
                             'id'      => 'mcp_desc',
                             'type'    => 'textarea',
-                            'label'   => 'Description',
+                            'label'   => __('Description', 'kp-agent-ready'),
                             'rows'    => 3,
-                            'default' => 'Personal portfolio and blog of Kevin Pirnie — WordPress Developer & DevOps Engineer.',
+                            'default' => __('Personal portfolio and blog of Kevin Pirnie — WordPress Developer & DevOps Engineer.', 'kp-agent-ready'),
                         ],
                         [
                             'id'          => 'mcp_transport',
                             'type'        => 'url',
-                            'label'       => 'Transport Endpoint URL',
-                            'sublabel'    => 'Leave blank if no MCP server is currently running.',
-                            'placeholder' => 'https://kevinpirnie.com/mcp',
+                            'label'       => __('Transport Endpoint URL', 'kp-agent-ready'),
+                            'sublabel'    => __('Leave blank if no MCP server is currently running.', 'kp-agent-ready'),
+                            'placeholder' => home_url('/mcp'),
                         ],
                     ],
                 ],
                 'capabilities' => [
-                    'title'       => 'Capabilities',
-                    'description' => 'Declare which MCP capabilities this server supports. Each entry adds a key to the <code>capabilities</code> object.',
+                    'title'       => __('Capabilities', 'kp-agent-ready'),
+                    'description' => __('Declare which MCP capabilities this server supports. Each entry adds a key to the <code>capabilities</code> object.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'mcp_capabilities',
                             'type'         => 'repeater',
-                            'label'        => 'Capabilities',
-                            'button_label' => 'Add Capability',
-                            'row_label'    => 'Capability',
+                            'label'        => __('Capabilities', 'kp-agent-ready'),
+                            'button_label' => __('Add Capability', 'kp-agent-ready'),
+                            'row_label'    => __('Capability', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'          => 'capability_key',
                                     'type'        => 'text',
-                                    'label'       => 'Capability Key',
-                                    'placeholder' => 'e.g. tools, resources, prompts',
+                                    'label'       => __('Capability Key', 'kp-agent-ready'),
+                                    'placeholder' => __('e.g. tools, resources, prompts', 'kp-agent-ready'),
                                     'required'    => true,
                                 ],
                             ],
@@ -583,126 +587,127 @@ class SettingsPage
      */
     private function tabOAuth(): array
     {
+        // setup the tabs settings
         return [
-            'title'    => 'OAuth / OIDC',
+            'title'    => __('OAuth / OIDC', 'kp-agent-ready'),
             'sections' => [
                 'type' => [
-                    'title'       => 'Discovery Type',
-                    'description' => 'Enable the OAuth / OIDC feature toggle in the Features tab to activate these endpoints.',
+                    'title'       => __('Discovery Type', 'kp-agent-ready'),
+                    'description' => __('Enable the OAuth / OIDC feature toggle in the Features tab to activate these endpoints.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'      => 'oauth_type',
                             'type'    => 'radio',
-                            'label'   => 'Protocol',
-                            'sublabel' => 'Determines which <code>/.well-known/</code> path is served.',
+                            'label'   => __('Protocol', 'kp-agent-ready'),
+                            'sublabel' => __('Determines which <code>/.well-known/</code> path is served.', 'kp-agent-ready'),
                             'options' => [
-                                'oidc'   => 'OpenID Connect — <code>/.well-known/openid-configuration</code>',
-                                'oauth2' => 'OAuth 2.0 only — <code>/.well-known/oauth-authorization-server</code>',
+                                'oidc'   => __('OpenID Connect — <code>/.well-known/openid-configuration</code>', 'kp-agent-ready'),
+                                'oauth2' => __('OAuth 2.0 only — <code>/.well-known/oauth-authorization-server</code>', 'kp-agent-ready'),
                             ],
                             'default' => 'oidc',
                         ],
                     ],
                 ],
                 'endpoints' => [
-                    'title'  => 'Endpoints',
+                    'title'  => __('Endpoints', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'          => 'oauth_issuer',
                             'type'        => 'url',
-                            'label'       => 'Issuer',
-                            'sublabel'    => 'The canonical issuer identifier URL.',
+                            'label'       => __('Issuer', 'kp-agent-ready'),
+                            'sublabel'    => __('The canonical issuer identifier URL.', 'kp-agent-ready'),
                             'placeholder' => home_url('/'),
                         ],
                         [
                             'id'          => 'oauth_auth_endpoint',
                             'type'        => 'url',
-                            'label'       => 'Authorization Endpoint',
+                            'label'       => __('Authorization Endpoint', 'kp-agent-ready'),
                             'placeholder' => home_url('/oauth/authorize'),
                         ],
                         [
                             'id'          => 'oauth_token_endpoint',
                             'type'        => 'url',
-                            'label'       => 'Token Endpoint',
+                            'label'       => __('Token Endpoint', 'kp-agent-ready'),
                             'placeholder' => home_url('/oauth/token'),
                         ],
                         [
                             'id'          => 'oauth_jwks_uri',
                             'type'        => 'url',
-                            'label'       => 'JWKS URI',
+                            'label'       => __('JWKS URI', 'kp-agent-ready'),
                             'placeholder' => home_url('/oauth/jwks.json'),
                         ],
                     ],
                 ],
                 'grant_types' => [
-                    'title'  => 'Supported Grant Types',
+                    'title'  => __('Supported Grant Types', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'      => 'oauth_grant_types',
                             'type'    => 'checkboxes',
-                            'label'   => 'grant_types_supported',
+                            'label'   => __('Grant Types Supported', 'kp-agent-ready'),
                             'options' => [
-                                'authorization_code' => 'authorization_code',
-                                'client_credentials' => 'client_credentials',
-                                'refresh_token'      => 'refresh_token',
-                                'implicit'           => 'implicit',
-                                'password'           => 'password',
-                                'urn:ietf:params:oauth:grant-type:device_code' => 'device_code',
+                                'authorization_code' => __('Auth. Code', 'kp-agent-ready'),
+                                'client_credentials' => __('Client Credentials', 'kp-agent-ready'),
+                                'refresh_token'      => __('Refresh Token', 'kp-agent-ready'),
+                                'implicit'           => __('Implicit', 'kp-agent-ready'),
+                                'password'           => __('Password', 'kp-agent-ready'),
+                                'urn:ietf:params:oauth:grant-type:device_code' => __('Device Code', 'kp-agent-ready'),
                             ],
                         ],
                     ],
                 ],
                 'response_types' => [
-                    'title'  => 'Supported Response Types',
+                    'title'  => __('Supported Response Types', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'      => 'oauth_response_types',
                             'type'    => 'checkboxes',
-                            'label'   => 'response_types_supported',
+                            'label'   => __('Response Types Supported', 'kp-agent-ready'),
                             'options' => [
-                                'code'             => 'code',
-                                'token'            => 'token',
-                                'id_token'         => 'id_token',
-                                'code token'       => 'code token',
-                                'code id_token'    => 'code id_token',
-                                'token id_token'   => 'token id_token',
-                                'code token id_token' => 'code token id_token',
+                                'code'             => __('Code', 'kp-agent-ready'),
+                                'token'            => __('Token', 'kp-agent-ready'),
+                                'id_token'         => __('ID token', 'kp-agent-ready'),
+                                'code token'       => __('Code Token', 'kp-agent-ready'),
+                                'code id_token'    => __('Code ID Token', 'kp-agent-ready'),
+                                'token id_token'   => __('Token ID Token', 'kp-agent-ready'),
+                                'code token id_token' => __('Code Token ID Token', 'kp-agent-ready'),
                             ],
                         ],
                     ],
                 ],
                 'token_auth' => [
-                    'title'  => 'Token Endpoint Auth Methods',
+                    'title'  => __('Token Endpoint Auth Methods', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'      => 'oauth_token_auth_methods',
                             'type'    => 'checkboxes',
-                            'label'   => 'token_endpoint_auth_methods_supported',
+                            'label'   => __('Endpoint Auth Methods', 'kp-agent-ready'),
                             'options' => [
-                                'client_secret_basic' => 'client_secret_basic',
-                                'client_secret_post'  => 'client_secret_post',
-                                'client_secret_jwt'   => 'client_secret_jwt',
-                                'private_key_jwt'     => 'private_key_jwt',
-                                'none'                => 'none (PKCE)',
+                                'client_secret_basic' => __('Client Secret Basic', 'kp-agent-ready'),
+                                'client_secret_post'  => __('Client Secret Post', 'kp-agent-ready'),
+                                'client_secret_jwt'   => __('Client Secret JWT', 'kp-agent-ready'),
+                                'private_key_jwt'     => __('Private Key JWT', 'kp-agent-ready'),
+                                'none'                => __('none (PKCE)', 'kp-agent-ready'),
                             ],
                         ],
                     ],
                 ],
                 'scopes' => [
-                    'title'       => 'Supported Scopes',
-                    'description' => 'Each entry adds a scope string to <code>scopes_supported</code>.',
+                    'title'       => __('Supported Scopes', 'kp-agent-ready'),
+                    'description' => __('Each entry adds a scope string to <code>scopes_supported</code>.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'oauth_scopes',
                             'type'         => 'repeater',
-                            'label'        => 'Scopes',
-                            'button_label' => 'Add Scope',
-                            'row_label'    => 'Scope',
+                            'label'        => __('Scopes', 'kp-agent-ready'),
+                            'button_label' => __('Add Scope', 'kp-agent-ready'),
+                            'row_label'    => __('Scope', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'          => 'scope',
                                     'type'        => 'text',
-                                    'label'       => 'Scope',
-                                    'placeholder' => 'e.g. openid, profile, email, read:posts',
+                                    'label'       => __('Scope', 'kp-agent-ready'),
+                                    'placeholder' => __('e.g. openid, profile, email, read:posts', 'kp-agent-ready'),
                                     'required'    => true,
                                 ],
                             ],
@@ -730,36 +735,36 @@ class SettingsPage
     private function tabOAuthResource(): array
     {
         return [
-            'title'    => 'OAuth Resource',
+            'title'    => __('OAuth Resource', 'kp-agent-ready'),
             'sections' => [
                 'resource' => [
-                    'title'       => 'Protected Resource Metadata',
-                    'description' => 'Configures <code>/.well-known/oauth-protected-resource</code> per <a href="https://www.rfc-editor.org/rfc/rfc9728" target="_blank">RFC 9728</a>. Enable via the Features tab.',
+                    'title'       => __('Protected Resource Metadata', 'kp-agent-ready'),
+                    'description' => __('Configures <code>/.well-known/oauth-protected-resource</code> per <a href="https://www.rfc-editor.org/rfc/rfc9728" target="_blank">RFC 9728</a>. Enable via the Features tab.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'          => 'opr_resource',
                             'type'        => 'url',
-                            'label'       => 'Resource Identifier',
-                            'sublabel'    => 'Canonical URL identifying this protected resource.',
+                            'label'       => __('Resource Identifier', 'kp-agent-ready'),
+                            'sublabel'    => __('Canonical URL identifying this protected resource.', 'kp-agent-ready'),
                             'placeholder' => home_url('/'),
                         ],
                     ],
                 ],
                 'auth_servers' => [
-                    'title'       => 'Authorization Servers',
-                    'description' => 'OAuth/OIDC issuer URLs that can issue tokens for this resource.',
+                    'title'       => __('Authorization Servers', 'kp-agent-ready'),
+                    'description' => __('OAuth/OIDC issuer URLs that can issue tokens for this resource.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'opr_auth_servers',
                             'type'         => 'repeater',
-                            'label'        => 'Authorization Servers',
-                            'button_label' => 'Add Server',
-                            'row_label'    => 'Server',
+                            'label'        => __('Authorization Servers', 'kp-agent-ready'),
+                            'button_label' => __('Add Server', 'kp-agent-ready'),
+                            'row_label'    => __('Server', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'          => 'server_url',
                                     'type'        => 'url',
-                                    'label'       => 'Issuer URL',
+                                    'label'       => __('Issuer URL', 'kp-agent-ready'),
                                     'placeholder' => 'https://auth.example.com',
                                     'required'    => true,
                                 ],
@@ -768,36 +773,36 @@ class SettingsPage
                     ],
                 ],
                 'bearer_methods' => [
-                    'title'  => 'Bearer Methods',
+                    'title'  => __('Bearer Methods', 'kp-agent-ready'),
                     'fields' => [
                         [
                             'id'      => 'opr_bearer_methods',
                             'type'    => 'checkboxes',
-                            'label'   => 'bearer_methods_supported',
+                            'label'   => __('Bearer Methods Supported', 'kp-agent-ready'),
                             'options' => [
-                                'header' => 'header (Authorization: Bearer)',
-                                'body'   => 'body (form parameter)',
-                                'query'  => 'query (URL parameter)',
+                                'header' => __('header (Authorization: Bearer)', 'kp-agent-ready'),
+                                'body'   => __('body (form parameter)', 'kp-agent-ready'),
+                                'query'  => __('query (URL parameter)', 'kp-agent-ready'),
                             ],
                         ],
                     ],
                 ],
                 'scopes' => [
-                    'title'       => 'Supported Scopes',
-                    'description' => 'Scopes this resource accepts. Each entry adds a scope string to <code>scopes_supported</code>.',
+                    'title'       => __('Supported Scopes', 'kp-agent-ready'),
+                    'description' => __('Scopes this resource accepts. Each entry adds a scope string to <code>scopes_supported</code>.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'           => 'opr_scopes',
                             'type'         => 'repeater',
-                            'label'        => 'Scopes',
-                            'button_label' => 'Add Scope',
-                            'row_label'    => 'Scope',
+                            'label'        => __('Scopes', 'kp-agent-ready'),
+                            'button_label' => __('Add Scope', 'kp-agent-ready'),
+                            'row_label'    => __('Scope', 'kp-agent-ready'),
                             'fields'       => [
                                 [
                                     'id'          => 'scope',
                                     'type'        => 'text',
-                                    'label'       => 'Scope',
-                                    'placeholder' => 'e.g. read:posts, write:comments',
+                                    'label'       => __('Scope', 'kp-agent-ready'),
+                                    'placeholder' => __('e.g. read:posts, write:comments', 'kp-agent-ready'),
                                     'required'    => true,
                                 ],
                             ],
@@ -824,25 +829,26 @@ class SettingsPage
     private function tabWebMcp(): array
     {
         return [
-            'title'    => 'WebMCP',
+            'title'    => __('WebMCP', 'kp-agent-ready'),
             'sections' => [
                 'tools' => [
-                    'title'       => 'Built-in Tools',
-                    'description' => 'Configure which tools are exposed to agents via <code>navigator.modelContext</code>. Requires the WebMCP feature toggle to be enabled.',
+                    'title'       => __('Built-in Tools', 'kp-agent-ready'),
+                    'description' => __('Configure which tools are exposed to agents via <code>navigator.modelContext</code>. Requires the WebMCP feature toggle to be enabled.', 'kp-agent-ready'),
                     'fields'      => [
                         [
                             'id'             => 'webmcp_search',
                             'type'           => 'switch',
-                            'label'          => 'Blog Search',
-                            'checkbox_label' => 'Enable the blog search tool',
+                            'label'          => __('Blog Search', 'kp-agent-ready'),
+                            'checkbox_label' => __('Enable the blog search tool', 'kp-agent-ready'),
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
                         ],
                         [
                             'id'          => 'webmcp_search_desc',
                             'type'        => 'text',
-                            'label'       => 'Search Tool Description',
-                            'placeholder' => sprintf('Search %s', get_bloginfo('name')),
+                            'label'       => __('Search Tool Description', 'kp-agent-ready'),
+                            // translators: %s is the site name
+                            'placeholder' => sprintf(__('Search %s', 'kp-agent-ready'), get_bloginfo('name')),
                             'conditional' => ['field' => 'webmcp_search', 'value' => true, 'condition' => '=='],
                         ],
                         [
@@ -852,22 +858,23 @@ class SettingsPage
                         [
                             'id'             => 'webmcp_portfolio',
                             'type'           => 'switch',
-                            'label'          => 'Portfolio Navigation',
-                            'checkbox_label' => 'Enable the portfolio navigation tool',
+                            'label'          => __('Portfolio Navigation', 'kp-agent-ready'),
+                            'checkbox_label' => __('Enable the portfolio navigation tool', 'kp-agent-ready'),
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
                         ],
                         [
                             'id'          => 'webmcp_portfolio_desc',
                             'type'        => 'text',
-                            'label'       => 'Portfolio Tool Description',
-                            'placeholder' => sprintf('Browse the portfolio on %s', get_bloginfo('name')),
+                            'label'       => __('Portfolio Tool Description', 'kp-agent-ready'),
+                            // translators: %s is the site name
+                            'placeholder' => sprintf(__('Browse the portfolio on %s', 'kp-agent-ready'), get_bloginfo('name')),
                             'conditional' => ['field' => 'webmcp_portfolio', 'value' => true, 'condition' => '=='],
                         ],
                         [
                             'id'          => 'webmcp_portfolio_url',
                             'type'        => 'url',
-                            'label'       => 'Portfolio URL',
+                            'label'       => __('Portfolio URL', 'kp-agent-ready'),
                             'placeholder' => home_url('/portfolio/'),
                             'conditional' => ['field' => 'webmcp_portfolio', 'value' => true, 'condition' => '=='],
                         ],
@@ -878,22 +885,23 @@ class SettingsPage
                         [
                             'id'             => 'webmcp_contact',
                             'type'           => 'switch',
-                            'label'          => 'Contact Navigation',
-                            'checkbox_label' => 'Enable the contact navigation tool',
+                            'label'          => __('Contact Navigation', 'kp-agent-ready'),
+                            'checkbox_label' => __('Enable the contact navigation tool', 'kp-agent-ready'),
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
                         ],
                         [
                             'id'          => 'webmcp_contact_desc',
                             'type'        => 'text',
-                            'label'       => 'Contact Tool Description',
-                            'placeholder' => sprintf('Contact %s', get_bloginfo('name')),
+                            'label'       => __('Contact Tool Description', 'kp-agent-ready'),
+                            // translators: %s is the site name
+                            'placeholder' => sprintf(__('Contact %s', 'kp-agent-ready'), get_bloginfo('name')),
                             'conditional' => ['field' => 'webmcp_contact', 'value' => true, 'condition' => '=='],
                         ],
                         [
                             'id'          => 'webmcp_contact_url',
                             'type'        => 'url',
-                            'label'       => 'Contact URL',
+                            'label'       => __('Contact URL', 'kp-agent-ready'),
                             'placeholder' => home_url('/contact/'),
                             'conditional' => ['field' => 'webmcp_contact', 'value' => true, 'condition' => '=='],
                         ],
@@ -902,7 +910,6 @@ class SettingsPage
             ],
         ];
     }
-
 
     /**
      * buildCptSection
@@ -932,26 +939,26 @@ class SettingsPage
 
         if (empty($opts)) {
             return [
-                'title'  => 'Custom Post Types',
+                'title'  => __('Custom Post Types', 'kp-agent-ready'),
                 'fields' => [
                     [
                         'id'           => 'no_cpts_notice',
                         'type'         => 'message',
                         'message_type' => 'info',
-                        'content'      => 'No custom post types are currently registered (other than built-ins).',
+                        'content'      => __('No custom post types are currently registered (other than built-ins).', 'kp-agent-ready'),
                     ],
                 ],
             ];
         }
 
         return [
-            'title'       => 'Custom Post Types',
-            'description' => 'Each checked CPT generates a browsable skill entry pointing to its archive URL.',
+            'title'       => __('Custom Post Types', 'kp-agent-ready'),
+            'description' => __('Each checked CPT generates a browsable skill entry pointing to its archive URL.', 'kp-agent-ready'),
             'fields'      => [
                 [
                     'id'      => 'skill_cpts',
                     'type'    => 'checkboxes',
-                    'label'   => 'Enabled CPTs',
+                    'label'   => __('Enabled CPTs', 'kp-agent-ready'),
                     'options' => $opts,
                 ],
             ],

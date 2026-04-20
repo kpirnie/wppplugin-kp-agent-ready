@@ -14,6 +14,9 @@ composer update;
 # dump the composer autoloader and force it to regenerate
 composer dumpautoload -o -n;
 
+# make sure to setup the language folder and pot file
+mkdir -p languages && wp --allow-root i18n make-pot . languages/kp-agent-ready.pot --domain=kp-agent-ready
+
 # just inn case php is caching
 service php8.4-fpm restart && service nginx reload
 

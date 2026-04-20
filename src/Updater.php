@@ -6,7 +6,7 @@
  * Hooks into the WordPress plugin update system to check for new
  * releases published on GitHub and surface them in the admin dashboard.
  *
- * @since 1.1.0
+ * @since 1.0.68
  * @author Kevin Pirnie <me@kpirnie.com>
  * @package KP Agent Ready
  *
@@ -255,7 +255,7 @@ class Updater
      * Constructs the stdClass object that WordPress expects to find inside
      * the update_plugins transient response array for a given plugin.
      *
-     * @since 1.1.0
+     * @since 1.0.68
      * @access private
      * @author Kevin Pirnie <iam@kevinpirnie.com>
      * @package KP Agent Ready

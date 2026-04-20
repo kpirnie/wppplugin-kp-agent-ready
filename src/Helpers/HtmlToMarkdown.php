@@ -1,13 +1,55 @@
 <?php
 
+/** 
+ * HtmlToMarkdown
+ * 
+ * Provides a basic HTML to Markdown conversion used by the
+ * MarkdownNegotiation module when serving text/markdown responses.
+ * 
+ * @since 1.0.0
+ * @author Kevin Pirnie <me@kpirnie.com>
+ * @package KP Agent Ready
+ * 
+ */
+
+// setup the namespace
 namespace KP\AgentReady\Helpers;
 
+// We don't want to allow direct access to this
+defined('ABSPATH') || die('No direct script access allowed');
+
 /**
- * Rudimentary HTML → Markdown converter used for markdown negotiation.
+ * HtmlToMarkdown
+ *
+ * Provides a basic HTML to Markdown conversion used by the
+ * MarkdownNegotiation module when serving text/markdown responses.
+ *
+ * @since 1.0.0
+ * @author Kevin Pirnie <iam@kevinpirnie.com>
+ * @package KP Agent Ready
+ *
  */
 class HtmlToMarkdown
 {
 
+    /**
+     * convert
+     *
+     * Converts an HTML string to a Markdown string. Handles headings,
+     * inline formatting, links, images, lists, paragraphs, code blocks,
+     * blockquotes, and horizontal rules. Strips any remaining tags after
+     * conversion and normalises whitespace.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $html The HTML string to convert
+     *
+     * @return string The converted Markdown string
+     *
+     */
     public static function convert(string $html): string
     {
         // Strip scripts and styles first

@@ -1,23 +1,50 @@
 <?php
 
+/** 
+ * WellKnown
+ * 
+ * Registers and serves all /.well-known/* endpoints for agent discovery.
+ * 
+ * @since 1.0.0
+ * @author Kevin Pirnie <me@kpirnie.com>
+ * @package KP Agent Ready
+ * 
+ */
+
+// setup the namespace
 namespace KP\AgentReady\Modules;
 
+// We don't want to allow direct access to this
+defined('ABSPATH') || die('No direct script access allowed');
+
 /**
+ * WellKnown
+ *
  * Registers and serves all /.well-known/* endpoints for agent discovery.
  *
- * Endpoints:
- *   /.well-known/api-catalog                RFC 9727  — application/linkset+json
- *   /.well-known/agent-skills/index.json    Agent Skills Discovery v0.2.0
- *   /.well-known/mcp/server-card.json       SEP-1649
- *   /.well-known/openid-configuration       OpenID Connect Discovery 1.0
- *   /.well-known/oauth-authorization-server RFC 8414
- *   /.well-known/oauth-protected-resource   RFC 9728
+ * @since 1.0.0
+ * @author Kevin Pirnie <iam@kevinpirnie.com>
+ * @package KP Agent Ready
+ *
  */
 class WellKnown extends AbstractModule
 {
 
     private const QUERY_VAR = 'kp_agent';
 
+    /**
+     * register
+     *
+     * Attaches rewrite rule registration, query var, and dispatch hooks.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public function register(): void
     {
         add_action('init',              [__CLASS__, 'registerRules']);
@@ -25,6 +52,20 @@ class WellKnown extends AbstractModule
         add_action('template_redirect', [$this, 'dispatch'], 1);
     }
 
+    /**
+     * registerRules
+     *
+     * Adds rewrite rules for all /.well-known/* endpoints.
+     * Called on init and on plugin activation.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public static function registerRules(): void
     {
         $rules = [
@@ -41,13 +82,41 @@ class WellKnown extends AbstractModule
         }
     }
 
-    /** @param string[] $vars */
+    /**
+     * addQueryVar
+     *
+     * Registers the kp_agent query variable with WordPress.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string[] $vars The current registered query vars
+     *
+     * @return string[] The query vars array with kp_agent appended
+     *
+     */
     public function addQueryVar(array $vars): array
     {
         $vars[] = self::QUERY_VAR;
         return $vars;
     }
 
+    /**
+     * dispatch
+     *
+     * Reads the kp_agent query var and routes to the appropriate
+     * endpoint handler. No-ops if the var is not set.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public function dispatch(): void
     {
         $ep = get_query_var(self::QUERY_VAR);
@@ -64,10 +133,21 @@ class WellKnown extends AbstractModule
         };
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/api-catalog  (RFC 9727)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveApiCatalog
+     *
+     * Serves /.well-known/api-catalog as application/linkset+json per RFC 9727.
+     * Builds entries from the api_catalog_entries repeater setting.
+     * Falls back to a minimal valid catalog when no entries are configured.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveApiCatalog(): never
     {
         $entries = (array) $this->opt('api_catalog_entries', []);
@@ -109,10 +189,20 @@ class WellKnown extends AbstractModule
         $this->respond(['linkset' => $linkset], 'application/linkset+json');
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/agent-skills/index.json  (Agent Skills Discovery v0.2.0)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveAgentSkills
+     *
+     * Serves /.well-known/agent-skills/index.json per Agent Skills Discovery v0.2.0.
+     * Applies the kp_agent_skills filter before output.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveAgentSkills(): never
     {
         $skills = apply_filters('kp_agent_skills', $this->buildSkills());
@@ -125,10 +215,20 @@ class WellKnown extends AbstractModule
         $this->respond($payload);
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/mcp/server-card.json  (SEP-1649)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveMcpCard
+     *
+     * Serves /.well-known/mcp/server-card.json per SEP-1649.
+     * Builds the capabilities object from the mcp_capabilities repeater setting.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveMcpCard(): never
     {
         $capabilities_raw = (array) $this->opt('mcp_capabilities', []);
@@ -155,10 +255,20 @@ class WellKnown extends AbstractModule
         $this->respond($payload);
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/openid-configuration  (OpenID Connect Discovery 1.0)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveOidcConfig
+     *
+     * Serves /.well-known/openid-configuration per OpenID Connect Discovery 1.0.
+     * Returns 404 if OAuth is disabled or the selected type is not 'oidc'.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveOidcConfig(): never
     {
         if (! $this->opt('oauth_enabled', false) || $this->opt('oauth_type', 'oidc') !== 'oidc') {
@@ -169,10 +279,20 @@ class WellKnown extends AbstractModule
         $this->respond($this->buildOauthPayload());
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/oauth-authorization-server  (RFC 8414)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveOauthConfig
+     *
+     * Serves /.well-known/oauth-authorization-server per RFC 8414.
+     * Returns 404 if OAuth is disabled or the selected type is not 'oauth2'.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveOauthConfig(): never
     {
         if (! $this->opt('oauth_enabled', false) || $this->opt('oauth_type', 'oidc') !== 'oauth2') {
@@ -183,10 +303,20 @@ class WellKnown extends AbstractModule
         $this->respond($this->buildOauthPayload());
     }
 
-    // -------------------------------------------------------------------------
-    // /.well-known/oauth-protected-resource  (RFC 9728)
-    // -------------------------------------------------------------------------
-
+    /**
+     * serveOauthResource
+     *
+     * Serves /.well-known/oauth-protected-resource per RFC 9728.
+     * Returns 404 if the OAuth Protected Resource feature is disabled.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function serveOauthResource(): never
     {
         if (! $this->opt('opr_enabled', false)) {
@@ -220,14 +350,19 @@ class WellKnown extends AbstractModule
         $this->respond($payload);
     }
 
-    // -------------------------------------------------------------------------
-    // Builders
-    // -------------------------------------------------------------------------
-
     /**
-     * Shared OAuth/OIDC discovery payload used by both endpoint types.
+     * buildOauthPayload
      *
-     * @return array<string, mixed>
+     * Assembles the shared OAuth/OIDC discovery metadata payload
+     * used by both serveOidcConfig() and serveOauthConfig().
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The discovery metadata array
+     *
      */
     private function buildOauthPayload(): array
     {
@@ -255,12 +390,18 @@ class WellKnown extends AbstractModule
     }
 
     /**
-     * Assembles the agent skills array from:
-     *   1. Blog / articles (if enabled)
-     *   2. Configured custom post types
-     *   3. Manually defined custom skills (repeater)
+     * buildSkills
      *
-     * @return array<int, array<string, string>>
+     * Assembles the agent skills array from blog settings, enabled CPTs,
+     * and manually defined custom skills from the repeater setting.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<int, array<string, string>> The assembled skills array
+     *
      */
     private function buildSkills(): array
     {
@@ -321,11 +462,22 @@ class WellKnown extends AbstractModule
         return $skills;
     }
 
-    // -------------------------------------------------------------------------
-    // Utility
-    // -------------------------------------------------------------------------
-
-    /** @param array<mixed> $payload */
+    /**
+     * respond
+     *
+     * Emits a JSON response with the appropriate Content-Type header and exits.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param array<mixed> $payload      The data to encode as JSON
+     * @param string       $content_type The Content-Type header value
+     *
+     * @return never Emits response and exits
+     *
+     */
     private function respond(array $payload, string $content_type = 'application/json'): never
     {
         status_header(200);

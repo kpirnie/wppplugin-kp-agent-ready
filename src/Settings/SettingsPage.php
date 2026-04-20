@@ -2,23 +2,25 @@
 
 namespace KP\AgentReady\Settings;
 
+
+// We don't want to allow direct access to this
+defined('ABSPATH') || die('No direct script access allowed');
+
+
+
 use KP\AgentReady\Plugin;
 use KP\WPFieldFramework\Loader;
 
 /**
- * Registers the plugin settings page using KPT WP Field Framework.
+ * SettingsPage
  *
- * Stored under option key: kp_agent_ready
+ * Registers the plugin's tabbed admin settings page using KPT WP Field Framework.
+ * All settings are stored under the option key defined in Plugin::OPTION_KEY.
  *
- * Tabs:
- *   Features            — master feature toggles
- *   API Catalog         — RFC 9727 linkset entries (repeater)
- *   Agent Skills        — blog toggle, CPT checkboxes, custom skills repeater
- *   Content Signals     — ai-train / search / ai-input preferences
- *   MCP Server Card     — SEP-1649 server card fields + capabilities repeater
- *   OAuth / OIDC        — issuer, endpoints, grant types, scopes (repeater)
- *   OAuth Resource      — RFC 9728 protected resource metadata
- *   WebMCP              — built-in tool toggles
+ * @since 1.0.0
+ * @author Kevin Pirnie <iam@kevinpirnie.com>
+ * @package KP Agent Ready
+ *
  */
 class SettingsPage
 {
@@ -44,6 +46,19 @@ class SettingsPage
     /** @param array<string, mixed> $options */
     public function __construct(private array $options) {}
 
+    /**
+     * register
+     *
+     * Hooks init for settings registration and admin_menu for submenu links.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public function register(): void
     {
         // Priority 20 — after CPTs from other plugins are registered at 10
@@ -51,19 +66,64 @@ class SettingsPage
         add_action('admin_menu', [$this, 'registerSubmenus'], 20);
     }
 
+    /**
+     * init
+     *
+     * Initialises the KPT WP Field Framework and registers the options page.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public function init(): void
     {
         $framework = Loader::init();
         $framework->addOptionsPage($this->buildConfig());
     }
 
-    // -------------------------------------------------------------------------
-    // Page config
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * buildConfig
+     *
+     * Assembles the full options page configuration array passed to
+     * the KPT WP Field Framework.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The complete options page configuration
+     *
+     */
     private function buildConfig(): array
     {
+        $tabs = [
+            'features'     => $this->tabFeatures(),
+            'api_catalog'  => $this->tabApiCatalog(),
+            'agent_skills' => $this->tabAgentSkills(),
+            'mcp_card'     => $this->tabMcpCard(),
+        ];
+
+        if ($this->options['content_signals_enabled'] ?? true) {
+            $tabs['content_signals'] = $this->tabContentSignals();
+        }
+
+        if ($this->options['oauth_enabled'] ?? false) {
+            $tabs['oauth'] = $this->tabOAuth();
+        }
+
+        if ($this->options['opr_enabled'] ?? false) {
+            $tabs['oauth_resource'] = $this->tabOAuthResource();
+        }
+
+        if ($this->options['webmcp_enabled'] ?? true) {
+            $tabs['webmcp'] = $this->tabWebMcp();
+        }
+
         return [
             'page_title'         => 'Agent Ready',
             'menu_title'         => 'Agent Ready',
@@ -71,30 +131,48 @@ class SettingsPage
             'icon_url'           => 'dashicons-superhero-alt',
             'position'           => 30,
             'show_export_import' => true,
-            'tabs'               => [
-                'features'        => $this->tabFeatures(),
-                'api_catalog'     => $this->tabApiCatalog(),
-                'agent_skills'    => $this->tabAgentSkills(),
-                'content_signals' => $this->tabContentSignals(),
-                'mcp_card'        => $this->tabMcpCard(),
-                'oauth'           => $this->tabOAuth(),
-                'oauth_resource'  => $this->tabOAuthResource(),
-                'webmcp'          => $this->tabWebMcp(),
-            ],
+            'tabs'               => $tabs,
         ];
     }
 
+    /**
+     * registerSubmenus
+     *
+     * Registers each settings tab as a child submenu link under the
+     * main Agent Ready menu item.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
     public function registerSubmenus(): void
     {
         $tabs = [
-            'api_catalog'    => 'API Catalog',
-            'agent_skills'   => 'Agent Skills',
-            'content_signals' => 'Content Signals',
-            'mcp_card'       => 'MCP Server Card',
-            'oauth'          => 'OAuth / OIDC',
-            'oauth_resource' => 'OAuth Resource',
-            'webmcp'         => 'WebMCP',
+            'features'     => 'Features',
+            'api_catalog'  => 'API Catalog',
+            'agent_skills' => 'Agent Skills',
+            'mcp_card'     => 'MCP Server Card',
         ];
+
+        if ($this->options['content_signals_enabled'] ?? true) {
+            $tabs['content_signals'] = 'Content Signals';
+        }
+
+        if ($this->options['oauth_enabled'] ?? false) {
+            $tabs['oauth'] = 'OAuth / OIDC';
+        }
+
+        if ($this->options['opr_enabled'] ?? false) {
+            $tabs['oauth_resource'] = 'OAuth Resource';
+        }
+
+        if ($this->options['webmcp_enabled'] ?? true) {
+            $tabs['webmcp'] = 'WebMCP';
+        }
 
         foreach ($tabs as $tab => $label) {
             $url = add_query_arg('tab', $tab, 'admin.php?page=' . Plugin::OPTION_KEY);
@@ -108,11 +186,19 @@ class SettingsPage
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: Features
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabFeatures
+     *
+     * Builds the Features tab configuration — master toggles for all features.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabFeatures(): array
     {
         return [
@@ -169,11 +255,19 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: API Catalog  (RFC 9727)
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabApiCatalog
+     *
+     * Builds the API Catalog tab configuration — repeater for RFC 9727 linkset entries.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabApiCatalog(): array
     {
         // Collect pages for the service-doc page selector
@@ -234,11 +328,20 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: Agent Skills  (Agent Skills Discovery v0.2.0)
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabAgentSkills
+     *
+     * Builds the Agent Skills tab configuration — blog toggle, CPT checkboxes,
+     * and custom skills repeater.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabAgentSkills(): array
     {
         return [
@@ -320,11 +423,20 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: Content Signals
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabContentSignals
+     *
+     * Builds the Content Signals tab configuration — ai-train, search,
+     * and ai-input preference fields.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabContentSignals(): array
     {
         $yes_no = ['yes' => 'Yes', 'no' => 'No'];
@@ -366,11 +478,20 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: MCP Server Card  (SEP-1649)
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabMcpCard
+     *
+     * Builds the MCP Server Card tab configuration — server info fields
+     * and capabilities repeater.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabMcpCard(): array
     {
         return [
@@ -434,11 +555,20 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: OAuth / OIDC Discovery
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabOAuth
+     *
+     * Builds the OAuth / OIDC tab configuration — protocol type, endpoints,
+     * grant types, response types, token auth methods, and scopes.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabOAuth(): array
     {
         return [
@@ -571,11 +701,20 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: OAuth Protected Resource  (RFC 9728)
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabOAuthResource
+     *
+     * Builds the OAuth Protected Resource tab configuration — resource identifier,
+     * authorization servers, bearer methods, and scopes.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabOAuthResource(): array
     {
         return [
@@ -657,11 +796,19 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Tab: WebMCP
-    // -------------------------------------------------------------------------
-
-    /** @return array<string, mixed> */
+    /**
+     * tabWebMcp
+     *
+     * Builds the WebMCP tab configuration — built-in tool toggles.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
     private function tabWebMcp(): array
     {
         return [
@@ -669,31 +816,74 @@ class SettingsPage
             'sections' => [
                 'tools' => [
                     'title'       => 'Built-in Tools',
-                    'description' => 'Toggle which built-in tools are exposed to agents via <code>navigator.modelContext</code>. Requires the WebMCP feature toggle to be enabled.',
+                    'description' => 'Configure which tools are exposed to agents via <code>navigator.modelContext</code>. Requires the WebMCP feature toggle to be enabled.',
                     'fields'      => [
                         [
                             'id'             => 'webmcp_search',
                             'type'           => 'switch',
                             'label'          => 'Blog Search',
-                            'checkbox_label' => 'Expose blog search as a WebMCP tool',
+                            'checkbox_label' => 'Enable the blog search tool',
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'          => 'webmcp_search_desc',
+                            'type'        => 'text',
+                            'label'       => 'Search Tool Description',
+                            'placeholder' => sprintf('Search %s', get_bloginfo('name')),
+                            'conditional' => ['field' => 'webmcp_search', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'   => 'sep_portfolio',
+                            'type' => 'separator',
                         ],
                         [
                             'id'             => 'webmcp_portfolio',
                             'type'           => 'switch',
                             'label'          => 'Portfolio Navigation',
-                            'checkbox_label' => 'Expose portfolio navigation as a WebMCP tool',
+                            'checkbox_label' => 'Enable the portfolio navigation tool',
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'          => 'webmcp_portfolio_desc',
+                            'type'        => 'text',
+                            'label'       => 'Portfolio Tool Description',
+                            'placeholder' => sprintf('Browse the portfolio on %s', get_bloginfo('name')),
+                            'conditional' => ['field' => 'webmcp_portfolio', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'          => 'webmcp_portfolio_url',
+                            'type'        => 'url',
+                            'label'       => 'Portfolio URL',
+                            'placeholder' => home_url('/portfolio/'),
+                            'conditional' => ['field' => 'webmcp_portfolio', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'   => 'sep_contact',
+                            'type' => 'separator',
                         ],
                         [
                             'id'             => 'webmcp_contact',
                             'type'           => 'switch',
                             'label'          => 'Contact Navigation',
-                            'checkbox_label' => 'Expose contact page navigation as a WebMCP tool',
+                            'checkbox_label' => 'Enable the contact navigation tool',
                             'default'        => true,
                             'conditional'    => ['field' => 'webmcp_enabled', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'          => 'webmcp_contact_desc',
+                            'type'        => 'text',
+                            'label'       => 'Contact Tool Description',
+                            'placeholder' => sprintf('Contact %s', get_bloginfo('name')),
+                            'conditional' => ['field' => 'webmcp_contact', 'value' => true, 'condition' => '=='],
+                        ],
+                        [
+                            'id'          => 'webmcp_contact_url',
+                            'type'        => 'url',
+                            'label'       => 'Contact URL',
+                            'placeholder' => home_url('/contact/'),
+                            'conditional' => ['field' => 'webmcp_contact', 'value' => true, 'condition' => '=='],
                         ],
                     ],
                 ],
@@ -701,14 +891,21 @@ class SettingsPage
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     /**
-     * Build the Custom Post Types section, populated from registered public CPTs.
+     * buildCptSection
      *
-     * @return array<string, mixed>
+     * Dynamically builds the Custom Post Types settings section from all
+     * registered public CPTs, excluding built-in WordPress types.
+     * Returns an info notice section if no qualifying CPTs are found.
+     *
+     * @since 1.0.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The section configuration array
+     *
      */
     private function buildCptSection(): array
     {

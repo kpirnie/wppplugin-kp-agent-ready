@@ -1,9 +1,33 @@
 <?php
 
+/** 
+ * AbstractModule
+ * 
+ * Base class for all plugin modules. Provides constructor injection of the
+ * options array and the opt() convenience helper.
+ * 
+ * @since 1.0.0
+ * @author Kevin Pirnie <me@kpirnie.com>
+ * @package KP Agent Ready
+ * 
+ */
+
+// setup the namespace
 namespace KP\AgentReady\Modules;
 
+// We don't want to allow direct access to this
+defined('ABSPATH') || die('No direct script access allowed');
+
 /**
- * Base class for all plugin modules.
+ * AbstractModule
+ *
+ * Base class for all plugin modules. Provides constructor injection of the
+ * options array and the opt() convenience helper.
+ *
+ * @since 1.0.0
+ * @author Kevin Pirnie <iam@kevinpirnie.com>
+ * @package KP Agent Ready
+ *
  */
 abstract class AbstractModule
 {
@@ -14,10 +38,21 @@ abstract class AbstractModule
     abstract public function register(): void;
 
     /**
-     * Retrieve an option value with a fallback default.
+     * opt
      *
-     * @param string $key     Option field ID.
-     * @param mixed  $default Fallback value.
+     * Retrieves a single option value from the loaded options array,
+     * returning a default if the key is not set.
+     *
+     * @since 1.0.0
+     * @access protected
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $key     The option field ID to retrieve
+     * @param mixed  $default Fallback value when the key is not present
+     *
+     * @return mixed The stored option value or the provided default
+     *
      */
     protected function opt(string $key, mixed $default = null): mixed
     {

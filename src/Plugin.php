@@ -94,8 +94,6 @@ final class Plugin
         // if we're in the admin
         if (is_admin()) {
             (new SettingsPage($this->options))->register();
-            add_action('admin_init',   [ServerRules::class, 'handleNoticeDismissal']);
-            add_action('admin_notices', [ServerRules::class, 'adminNotice']);
         }
 
         // fire up the modules
@@ -110,7 +108,9 @@ final class Plugin
     /**
      * activate
      *
-     * Runs on plugin activation — registers rewrite rules and flushes.
+     * Runs on plugin activation. The well-known endpoints are dispatched
+     * directly from REQUEST_URI, so no rewrite rules or server-level
+     * configuration need to be written here.
      *
      * @since 1.0.0
      * @access public
@@ -122,20 +122,17 @@ final class Plugin
      */
     public static function activate(): void
     {
-        // register the rewwrite rules for the .well-known locations we'll need to inject
-        WellKnown::registerRules();
-
-        // flush the rewrites
+        // Legacy rewrite rules from earlier versions may still be cached
+        // in the rewrite_rules option — flush them so stale regexes are
+        // dropped and requests fall through to our parse_request handler.
         flush_rewrite_rules();
-
-        // setup the server rules
-        ServerRules::install();
     }
 
     /**
      * deactivate
      *
-     * Runs on plugin deactivation — flushes rewrite rules.
+     * Runs on plugin deactivation — flushes rewrite rules so any legacy
+     * well-known rules left behind by earlier versions are discarded.
      *
      * @since 1.0.0
      * @access public
@@ -148,6 +145,5 @@ final class Plugin
     public static function deactivate(): void
     {
         flush_rewrite_rules();
-        ServerRules::uninstall();
     }
 }

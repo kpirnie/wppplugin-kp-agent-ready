@@ -94,8 +94,6 @@ final class Plugin
         // if we're in the admin
         if (is_admin()) {
             (new SettingsPage($this->options))->register();
-            add_action('admin_init',   [ServerRules::class, 'handleNoticeDismissal']);
-            add_action('admin_notices', [ServerRules::class, 'adminNotice']);
         }
 
         // fire up the modules
@@ -122,14 +120,8 @@ final class Plugin
      */
     public static function activate(): void
     {
-        // register the rewwrite rules for the .well-known locations we'll need to inject
-        WellKnown::registerRules();
-
         // flush the rewrites
         flush_rewrite_rules();
-
-        // setup the server rules
-        ServerRules::install();
     }
 
     /**
@@ -148,6 +140,5 @@ final class Plugin
     public static function deactivate(): void
     {
         flush_rewrite_rules();
-        ServerRules::uninstall();
     }
 }

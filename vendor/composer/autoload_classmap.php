@@ -15,7 +15,6 @@ return array(
     'KP\\AgentReady\\Modules\\WebMCP' => $baseDir . '/src/Modules/WebMCP.php',
     'KP\\AgentReady\\Modules\\WellKnown' => $baseDir . '/src/Modules/WellKnown.php',
     'KP\\AgentReady\\Plugin' => $baseDir . '/src/Plugin.php',
-    'KP\\AgentReady\\ServerRules' => $baseDir . '/src/ServerRules.php',
     'KP\\AgentReady\\Settings\\SettingsPage' => $baseDir . '/src/Settings/SettingsPage.php',
     'KP\\AgentReady\\Updater' => $baseDir . '/src/Updater.php',
     'KP\\WPFieldFramework\\BlockGenerator' => $vendorDir . '/kevinpirnie/kpt-wpfieldframework/src/BlockGenerator.php',

@@ -30,14 +30,26 @@ defined('ABSPATH') || die('No direct script access allowed');
 class WellKnown extends AbstractModule
 {
 
-    /** Query var used to identify which endpoint to serve. */
-    private const QUERY_VAR = 'kp_agent';
+    /**
+     * Map of path regex => endpoint slug. Matched against the portion of
+     * REQUEST_URI that follows the WordPress home path, with leading and
+     * trailing slashes trimmed.
+     */
+    private const ROUTES = [
+        '#^\.well-known/api-catalog/?$#'              => 'api-catalog',
+        '#^\.well-known/agent-skills/index\.json$#'   => 'agent-skills',
+        '#^\.well-known/mcp/server-card\.json$#'      => 'mcp-server-card',
+        '#^\.well-known/openid-configuration$#'       => 'oidc-config',
+        '#^\.well-known/oauth-authorization-server$#' => 'oauth-config',
+        '#^\.well-known/oauth-protected-resource$#'   => 'oauth-resource',
+    ];
 
     /**
      * register
      *
-     * Attaches rewrite rule registration, query var, and request
-     * interception hooks.
+     * Attaches the request interception hook. No rewrite rules or query
+     * vars are registered — dispatch is driven entirely by REQUEST_URI
+     * inspection, so no Apache or Nginx configuration is required.
      *
      * @since 1.0.0
      * @access public
@@ -49,73 +61,19 @@ class WellKnown extends AbstractModule
      */
     public function register(): void
     {
-        add_action('init',       [__CLASS__, 'registerRules']);
-        add_filter('query_vars', [$this, 'addQueryVar']);
-        add_action('wp_loaded',  [$this, 'interceptRequest'], PHP_INT_MIN);
-    }
-
-    /**
-     * registerRules
-     *
-     * Adds rewrite rules for all /.well-known/* endpoints.
-     * Called on init and on plugin activation.
-     *
-     * @since 1.0.0
-     * @access public
-     * @author Kevin Pirnie <iam@kevinpirnie.com>
-     * @package KP Agent Ready
-     *
-     * @return void This method does not return anything
-     *
-     */
-    public static function registerRules(): void
-    {
-        $rules = [
-            '^\.well-known/api-catalog/?$'              => 'api-catalog',
-            '^\.well-known/agent-skills/index\.json$'   => 'agent-skills',
-            '^\.well-known/mcp/server-card\.json$'      => 'mcp-server-card',
-            '^\.well-known/openid-configuration$'       => 'oidc-config',
-            '^\.well-known/oauth-authorization-server$' => 'oauth-config',
-            '^\.well-known/oauth-protected-resource$'   => 'oauth-resource',
-        ];
-
-        foreach ($rules as $regex => $ep) {
-            add_rewrite_rule($regex, 'index.php?' . self::QUERY_VAR . '=' . $ep, 'top');
-        }
-    }
-
-    /**
-     * addQueryVar
-     *
-     * Registers the kp_agent query variable with WordPress.
-     *
-     * @since 1.0.0
-     * @access public
-     * @author Kevin Pirnie <iam@kevinpirnie.com>
-     * @package KP Agent Ready
-     *
-     * @param string[] $vars The current registered query vars
-     *
-     * @return string[] The query vars array with kp_agent appended
-     *
-     */
-    public function addQueryVar(array $vars): array
-    {
-        // Handles both WordPress query_vars (indexed) and Yoast allow list (associative)
-        if (array_is_list($vars)) {
-            $vars[] = self::QUERY_VAR;
-        } else {
-            $vars[self::QUERY_VAR] = true;
-        }
-        return $vars;
+        add_action('parse_request', [$this, 'interceptRequest'], PHP_INT_MIN);
     }
 
     /**
      * interceptRequest
      *
-     * Fires on wp_loaded before WordPress processes the query. Reads
-     * REQUEST_URI directly and serves the matching well-known endpoint
-     * using raw PHP headers so no WordPress redirect logic can interfere.
+     * Fires as soon as WordPress begins parsing the request. Inspects
+     * REQUEST_URI directly and, when it matches one of the well-known
+     * endpoints, emits the response and exits. This bypasses the
+     * rewrite-rule pipeline entirely, so the endpoints work without
+     * any .htaccess or Nginx configuration — the only requirement is
+     * that pretty permalinks route unknown paths to index.php, which
+     * WordPress already handles on every supported server.
      *
      * @since 1.1.0
      * @access public
@@ -127,21 +85,64 @@ class WellKnown extends AbstractModule
      */
     public function interceptRequest(): void
     {
-        $ep = sanitize_key($_GET['kp_agent'] ?? '');
+        $path = $this->resolveRequestPath();
 
-        if (! $ep) {
+        if ($path === '') {
             return;
         }
 
-        match ($ep) {
-            'api-catalog'     => $this->serveApiCatalog(),
-            'agent-skills'    => $this->serveAgentSkills(),
-            'mcp-server-card' => $this->serveMcpCard(),
-            'oidc-config'     => $this->serveOidcConfig(),
-            'oauth-config'    => $this->serveOauthConfig(),
-            'oauth-resource'  => $this->serveOauthResource(),
-            default           => null,
-        };
+        foreach (self::ROUTES as $regex => $ep) {
+            if (preg_match($regex, $path)) {
+                match ($ep) {
+                    'api-catalog'     => $this->serveApiCatalog(),
+                    'agent-skills'    => $this->serveAgentSkills(),
+                    'mcp-server-card' => $this->serveMcpCard(),
+                    'oidc-config'     => $this->serveOidcConfig(),
+                    'oauth-config'    => $this->serveOauthConfig(),
+                    'oauth-resource'  => $this->serveOauthResource(),
+                };
+                return; // unreachable — serve* methods exit
+            }
+        }
+    }
+
+    /**
+     * resolveRequestPath
+     *
+     * Returns REQUEST_URI reduced to a path that is relative to the
+     * WordPress home URL, with any leading slash removed. Subdirectory
+     * installs are handled by stripping the home path prefix so that a
+     * request to /blog/.well-known/api-catalog on a WordPress install
+     * at /blog/ resolves to '.well-known/api-catalog'.
+     *
+     * @since 1.1.1
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return string The normalised request path, or '' when unavailable
+     *
+     */
+    private function resolveRequestPath(): string
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if ($uri === '') {
+            return '';
+        }
+
+        $path = parse_url($uri, PHP_URL_PATH);
+        if (! is_string($path) || $path === '') {
+            return '';
+        }
+
+        $home_path = trim((string) parse_url(home_url('/'), PHP_URL_PATH), '/');
+        $path      = ltrim($path, '/');
+
+        if ($home_path !== '' && str_starts_with($path, $home_path . '/')) {
+            $path = substr($path, strlen($home_path) + 1);
+        }
+
+        return $path;
     }
 
     /**

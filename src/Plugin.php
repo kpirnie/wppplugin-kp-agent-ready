@@ -94,6 +94,7 @@ final class Plugin
         // if we're in the admin
         if (is_admin()) {
             (new SettingsPage($this->options))->register();
+            (new Updater())->register();
         }
 
         // fire up the modules
@@ -102,7 +103,6 @@ final class Plugin
         (new WellKnown($this->options))->register();
         (new MarkdownNegotiation($this->options))->register();
         (new WebMCP($this->options))->register();
-        (new Updater())->register();
     }
 
     /**

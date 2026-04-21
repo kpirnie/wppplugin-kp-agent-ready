@@ -101,6 +101,7 @@ class WellKnown extends AbstractModule
                     'oidc-config'     => $this->serveOidcConfig(),
                     'oauth-config'    => $this->serveOauthConfig(),
                     'oauth-resource'  => $this->serveOauthResource(),
+                    default => null
                 };
                 return; // unreachable — serve* methods exit
             }
@@ -177,23 +178,22 @@ class WellKnown extends AbstractModule
             $anchor = trim($row['anchor'] ?? '');
             if (! $anchor) continue;
 
-            $item = ['anchor' => $anchor];
+            $item = ['anchor' => esc_url_raw($anchor)];
 
             if (! empty($row['service_desc'])) {
-                $item['service-desc'] = [['href' => $row['service_desc']]];
+                $item['service-desc'] = [['href' => esc_url_raw($row['service_desc'])]];
             }
 
-            // page_select overrides the manual URL when a page is chosen
             $service_doc = ! empty($row['service_doc_page'])
                 ? get_permalink((int) $row['service_doc_page'])
                 : ($row['service_doc'] ?? '');
 
             if ($service_doc) {
-                $item['service-doc'] = [['href' => $service_doc]];
+                $item['service-doc'] = [['href' => esc_url_raw($service_doc)]];
             }
 
             if (! empty($row['status'])) {
-                $item['status'] = [['href' => $row['status']]];
+                $item['status'] = [['href' => esc_url_raw($row['status'])]];
             }
 
             $linkset[] = $item;
@@ -201,10 +201,14 @@ class WellKnown extends AbstractModule
 
         // Fallback — minimal valid catalog pointing to the site itself
         if (empty($linkset)) {
+            $blog_url = get_option('page_for_posts')
+                ? get_permalink((int) get_option('page_for_posts'))
+                : home_url('/blog/');
+
             $linkset[] = [
                 'anchor'      => home_url('/'),
-                'service-doc' => [['href' => home_url('/blog/')]],
-                'describedby' => [['href' => home_url('/.well-known/agent-skills/index.json')]],
+                'service-doc' => [['href' => esc_url_raw($blog_url)]],
+                'describedby' => [['href' => esc_url_raw(home_url('/.well-known/agent-skills/index.json'))]],
             ];
         }
 
@@ -227,7 +231,7 @@ class WellKnown extends AbstractModule
      */
     private function serveAgentSkills(): never
     {
-        $skills = apply_filters('kp_agent_skills', $this->buildSkills());
+        $skills = (array) apply_filters('kp_agent_skills', $this->buildSkills());
 
         $payload = [
             '$schema' => 'https://agentskills.io/schema/v0.2.0/index.schema.json',
@@ -257,20 +261,20 @@ class WellKnown extends AbstractModule
         $capabilities     = (object) [];
 
         foreach ($capabilities_raw as $row) {
-            $key = trim($row['capability_key'] ?? '');
+            $key = sanitize_key(trim($row['capability_key'] ?? ''));
             if (! $key) continue;
             $capabilities->$key = (object) [];
         }
 
         $payload = [
             'serverInfo'   => [
-                'name'    => $this->opt('mcp_name',    get_bloginfo('name')),
-                'version' => $this->opt('mcp_version', '1.0.0'),
+                'name'    => sanitize_text_field($this->opt('mcp_name',    get_bloginfo('name'))),
+                'version' => sanitize_text_field($this->opt('mcp_version', '1.0.0')),
             ],
-            'transport'    => $this->opt('mcp_transport', null) ?: null,
+            'transport'    => $this->opt('mcp_transport', null) ? esc_url_raw($this->opt('mcp_transport')) : null,
             'capabilities' => $capabilities,
-            'description'  => $this->opt('mcp_desc', get_bloginfo('description')),
-            'homepage'     => home_url('/'),
+            'description'  => sanitize_text_field($this->opt('mcp_desc', get_bloginfo('description'))),
+            'homepage'     => esc_url_raw(home_url('/')),
             'contact'      => $this->opt('webmcp_contact_url', home_url('/contact/')),
         ];
 
@@ -348,22 +352,24 @@ class WellKnown extends AbstractModule
 
         $auth_servers = array_filter(
             array_map(
-                static fn($row) => trim($row['server_url'] ?? ''),
+                static fn($row) => esc_url_raw(trim($row['server_url'] ?? '')),
                 (array) $this->opt('opr_auth_servers', [])
             )
         );
 
         $scopes = array_filter(
             array_map(
-                static fn($row) => trim($row['scope'] ?? ''),
+                static fn($row) => sanitize_text_field(trim($row['scope'] ?? '')),
                 (array) $this->opt('opr_scopes', [])
             )
         );
 
-        $bearer_methods = array_values(array_filter((array) $this->opt('opr_bearer_methods', [])));
+        $bearer_methods = array_values(array_filter(
+            array_map('sanitize_text_field', (array) $this->opt('opr_bearer_methods', []))
+        ));
 
         $payload = array_filter([
-            'resource'                 => $this->opt('opr_resource', home_url('/')),
+            'resource'                 => esc_url_raw($this->opt('opr_resource', home_url('/'))),
             'authorization_servers'    => array_values($auth_servers),
             'scopes_supported'         => array_values($scopes),
             'bearer_methods_supported' => $bearer_methods ?: null,
@@ -388,22 +394,22 @@ class WellKnown extends AbstractModule
      */
     private function buildOauthPayload(): array
     {
-        $grant_types    = array_values(array_filter((array) $this->opt('oauth_grant_types', [])));
-        $response_types = array_values(array_filter((array) $this->opt('oauth_response_types', [])));
-        $auth_methods   = array_values(array_filter((array) $this->opt('oauth_token_auth_methods', [])));
+        $grant_types    = array_values(array_filter(array_map('sanitize_text_field', (array) $this->opt('oauth_grant_types', []))));
+        $response_types = array_values(array_filter(array_map('sanitize_text_field', (array) $this->opt('oauth_response_types', []))));
+        $auth_methods   = array_values(array_filter(array_map('sanitize_text_field', (array) $this->opt('oauth_token_auth_methods', []))));
 
         $scopes = array_filter(
             array_map(
-                static fn($row) => trim($row['scope'] ?? ''),
+                static fn($row) => sanitize_text_field(trim($row['scope'] ?? '')),
                 (array) $this->opt('oauth_scopes', [])
             )
         );
 
         return array_filter([
-            'issuer'                                => $this->opt('oauth_issuer', home_url('/')),
-            'authorization_endpoint'                => $this->opt('oauth_auth_endpoint')  ?: null,
-            'token_endpoint'                        => $this->opt('oauth_token_endpoint') ?: null,
-            'jwks_uri'                              => $this->opt('oauth_jwks_uri')        ?: null,
+            'issuer'                                => esc_url_raw($this->opt('oauth_issuer', home_url('/'))),
+            'authorization_endpoint'                => $this->opt('oauth_auth_endpoint')  ? esc_url_raw($this->opt('oauth_auth_endpoint'))  : null,
+            'token_endpoint'                        => $this->opt('oauth_token_endpoint') ? esc_url_raw($this->opt('oauth_token_endpoint')) : null,
+            'jwks_uri'                              => $this->opt('oauth_jwks_uri')        ? esc_url_raw($this->opt('oauth_jwks_uri'))        : null,
             'grant_types_supported'                 => $grant_types    ?: null,
             'response_types_supported'              => $response_types ?: null,
             'scopes_supported'                      => array_values($scopes) ?: null,
@@ -431,6 +437,10 @@ class WellKnown extends AbstractModule
         $site_name = get_bloginfo('name');
 
         if ($this->opt('skill_blog_enabled', true)) {
+            // Use the configured Posts page, fall back to /blog/
+            $blog_url = get_option('page_for_posts')
+                ? get_permalink((int) get_option('page_for_posts'))
+                : home_url('/blog/');
             $skills[] = [
                 'name'        => 'blog-search',
                 'type'        => 'search',
@@ -441,7 +451,7 @@ class WellKnown extends AbstractModule
                 'name'        => 'blog-articles',
                 'type'        => 'browse',
                 'description' => sprintf('Browse all blog articles published on %s.', home_url()),
-                'url'         => home_url('/blog/'),
+                'url'         => esc_url_raw($blog_url),
             ];
         }
 
@@ -465,12 +475,15 @@ class WellKnown extends AbstractModule
             // page_select overrides the manual URL when a page is chosen
             $url = ! empty($row['url_page'])
                 ? get_permalink((int) $row['url_page'])
-                : ($row['url'] ?? '');
+                : esc_url_raw($row['url'] ?? '');
+
+            $allowed_types = ['browse', 'search', 'form', 'action', 'api'];
+            $type          = in_array($row['type'] ?? 'browse', $allowed_types, true) ? $row['type'] : 'browse';
 
             $skill = [
                 'name'        => sanitize_title($name),
-                'type'        => $row['type']        ?? 'browse',
-                'description' => $row['description'] ?? '',
+                'type'        => $type,
+                'description' => sanitize_text_field($row['description'] ?? ''),
                 'url'         => $url,
             ];
 
@@ -505,12 +518,21 @@ class WellKnown extends AbstractModule
      */
     private function respond(array $payload, string $content_type = 'application/json'): never
     {
+        // setup the json response
+        $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        if ($json === false) {
+            http_response_code(500);
+            exit;
+        }
+
         // Raw PHP headers — intentionally bypassing WordPress header functions
         http_response_code(200);
         header("Content-Type: {$content_type}; charset=UTF-8");
         header('Cache-Control: public, max-age=3600');
         header('X-Robots-Tag: noindex');
-        echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        // echo our json return and exit
+        echo $json;
         exit;
     }
 }

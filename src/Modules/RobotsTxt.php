@@ -74,9 +74,10 @@ class RobotsTxt extends AbstractModule
             return $output;
         }
 
-        $ai_train = $this->opt('cs_ai_train', 'no');
-        $search   = $this->opt('cs_search',   'yes');
-        $ai_input = $this->opt('cs_ai_input', 'no');
+        $allowed  = ['yes', 'no'];
+        $ai_train = in_array(sanitize_key($this->opt('cs_ai_train', 'no')),  $allowed, true) ? sanitize_key($this->opt('cs_ai_train', 'no'))  : 'no';
+        $search   = in_array(sanitize_key($this->opt('cs_search',   'yes')), $allowed, true) ? sanitize_key($this->opt('cs_search',   'yes')) : 'yes';
+        $ai_input = in_array(sanitize_key($this->opt('cs_ai_input', 'no')),  $allowed, true) ? sanitize_key($this->opt('cs_ai_input', 'no'))  : 'no';
 
         $output .= "\n# Content Signals (https://contentsignals.org/)\n";
         $output .= "Content-Signal: ai-train={$ai_train}, search={$search}, ai-input={$ai_input}\n";

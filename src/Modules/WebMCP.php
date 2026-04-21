@@ -112,11 +112,11 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'search_blog',
                 'type'        => 'search',
-                'description' => $this->opt('webmcp_search_desc', sprintf('Search %s', $site_name)),
-                'url'         => home_url('/?s={query}'),
+                'description' => __($this->opt('webmcp_search_desc', sprintf('Search %s', $site_name)), 'kp-agent-ready'),
+                'url' => home_url('/?s={query}'),
                 'inputSchema' => [
                     'type'       => 'object',
-                    'properties' => ['query' => ['type' => 'string', 'description' => 'Search terms']],
+                    'properties' => ['query' => ['type' => 'string', 'description' => __('Search terms', 'kp-agent-ready')]],
                     'required'   => ['query'],
                 ],
             ];
@@ -126,8 +126,8 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'go_to_portfolio',
                 'type'        => 'navigate',
-                'description' => $this->opt('webmcp_portfolio_desc', sprintf('Browse the portfolio on %s', $site_name)),
-                'url'         => $this->opt('webmcp_portfolio_url', home_url('/portfolio/')),
+                'description' => __($this->opt('webmcp_portfolio_desc', sprintf('Browse the portfolio on %s', $site_name)), 'kp-agent-ready'),
+                'url'         => esc_url_raw($this->opt('webmcp_portfolio_url', home_url('/portfolio/'))),
                 'inputSchema' => ['type' => 'object', 'properties' => (object) [], 'required' => []],
             ];
         }
@@ -136,8 +136,8 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'go_to_contact',
                 'type'        => 'navigate',
-                'description' => $this->opt('webmcp_contact_desc', sprintf('Contact %s', $site_name)),
-                'url'         => $this->opt('webmcp_contact_url', home_url('/contact/')),
+                'description' => __($this->opt('webmcp_contact_desc', sprintf('Contact %s', $site_name)), 'kp-agent-ready'),
+                'url'         => esc_url_raw($this->opt('webmcp_contact_url', home_url('/contact/'))),
                 'inputSchema' => ['type' => 'object', 'properties' => (object) [], 'required' => []],
             ];
         }

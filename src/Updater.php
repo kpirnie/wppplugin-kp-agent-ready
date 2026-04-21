@@ -134,17 +134,17 @@ class Updater
         }
 
         $info                = new \stdClass();
-        $info->name          = 'KP Agent Ready';
+        $info->name          = __('KP Agent Ready', 'kp-agent-ready');
         $info->slug          = 'kp-agent-ready';
         $info->version       = $release->version;
-        $info->author        = '<a href="https://kevinpirnie.com">Kevin Pirnie</a>';
+        $info->author        = sprintf('<a href="https://kevinpirnie.com">%s</a>', __('Kevin Pirnie', 'kp-agent-ready'));
         $info->homepage      = 'https://github.com/kpirnie/wppplugin-kp-agent-ready';
         $info->requires      = '6.8';
         $info->requires_php  = '8.2';
         $info->download_link = $release->zip_url;
         $info->sections      = [
-            'description' => 'Make your WordPress site discoverable and usable by AI agents.',
-            'changelog'   => $release->body,
+            'description' => __('Make your WordPress site discoverable and usable by AI agents.', 'kp-agent-ready'),
+            'changelog'   => wp_kses_post($release->body),
         ];
 
         return $info;
@@ -184,8 +184,10 @@ class Updater
         $wp_filesystem->move($result['destination'], $target, true);
         $result['destination'] = $target;
 
-        // Reactivate so the plugin keeps running after upgrade
-        activate_plugin(self::PLUGIN_SLUG);
+        // Only reactivate if it was active before the upgrade
+        if (is_plugin_active(self::PLUGIN_SLUG)) {
+            activate_plugin(self::PLUGIN_SLUG);
+        }
 
         return $result;
     }
@@ -233,13 +235,18 @@ class Updater
         $zip_url = $body['zipball_url'];
         foreach ($body['assets'] ?? [] as $asset) {
             if (str_ends_with($asset['name'], '.zip')) {
-                $zip_url = $asset['browser_download_url'];
+                $candidate     = $asset['browser_download_url'];
+                $parsed_host   = wp_parse_url($candidate, PHP_URL_HOST);
+                $allowed_hosts = ['api.github.com', 'github.com', 'codeload.github.com'];
+                if (in_array($parsed_host, $allowed_hosts, true)) {
+                    $zip_url = $candidate;
+                }
                 break;
             }
         }
 
         $release          = new \stdClass();
-        $release->version = ltrim($body['tag_name'], 'v');
+        $release->version = sanitize_text_field(ltrim($body['tag_name'], 'v'));
         $release->zip_url = $zip_url;
         $release->body    = $body['body'] ?? '';
 
@@ -274,8 +281,16 @@ class Updater
         $payload->tested        = '7.0';
         $payload->requires_php  = '8.2';
         $payload->url           = 'https://github.com/kpirnie/wppplugin-kp-agent-ready';
-        $payload->package       = $release->zip_url;
+        // Only allow GitHub origins
+        $zip_url = $release->zip_url;
+        $allowed_hosts = ['api.github.com', 'github.com', 'codeload.github.com'];
+        $parsed_host   = wp_parse_url($zip_url, PHP_URL_HOST);
+        if (! in_array($parsed_host, $allowed_hosts, true)) {
+            $zip_url = '';
+        }
+        $payload->package = $zip_url;
 
+        // return the updater payload
         return $payload;
     }
 }

@@ -521,7 +521,7 @@ class SettingsPage
                             'id'      => 'mcp_name',
                             'type'    => 'text',
                             'label'   => __('Server Name', 'kp-agent-ready'),
-                            'default' => 'kevinpirnie.com',
+                            'default' => get_bloginfo('name'),
                         ],
                         [
                             'id'      => 'mcp_version',
@@ -534,7 +534,7 @@ class SettingsPage
                             'type'    => 'textarea',
                             'label'   => __('Description', 'kp-agent-ready'),
                             'rows'    => 3,
-                            'default' => __('Personal portfolio and blog of Kevin Pirnie — WordPress Developer & DevOps Engineer.', 'kp-agent-ready'),
+                            'default' => get_bloginfo('description'),
                         ],
                         [
                             'id'          => 'mcp_transport',

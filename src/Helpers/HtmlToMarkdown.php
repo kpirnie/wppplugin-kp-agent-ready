@@ -343,9 +343,10 @@ class HtmlToMarkdown
      */
     private static function renderLink(\DOMElement $node, string $content): string
     {
-        $href  = $node->getAttribute('href');
-        $title = $node->getAttribute('title');
+        $href  = esc_url_raw($node->getAttribute('href'));
+        $title = esc_attr($node->getAttribute('title'));
 
+        // make sure we have a url
         if ($href === '') {
             return $content;
         }
@@ -373,9 +374,14 @@ class HtmlToMarkdown
      */
     private static function renderImage(\DOMElement $node): string
     {
-        $src   = $node->getAttribute('src');
-        $alt   = $node->getAttribute('alt');
-        $title = $node->getAttribute('title');
+        $src   = esc_url_raw($node->getAttribute('src'));
+        $alt   = esc_attr($node->getAttribute('alt'));
+        $title = esc_attr($node->getAttribute('title'));
+
+        // make sure we have a source
+        if ($src === '') {
+            return '';
+        }
 
         return $title !== ''
             ? "![{$alt}]({$src} \"{$title}\")"

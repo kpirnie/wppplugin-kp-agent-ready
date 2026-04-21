@@ -90,6 +90,75 @@ Injects a small JavaScript snippet into your page footer that calls `navigator.m
 
 ---
 
+## Web Server Configuration
+
+WordPress handles `/.well-known/` requests through its normal rewrite pipeline. However, some server configurations block or short-circuit these paths before WordPress can process them. If your endpoints return 404, apply the relevant rule below.
+
+### Nginx
+
+Add inside your `server {}` block, **above** the primary `location /` block:
+
+```nginx
+# Route /.well-known/ through WordPress via the __kp_wk parameter
+location ^~ /.well-known/ {
+    auth_basic off;
+    allow all;
+    rewrite ^(/.*)$ /index.php?__kp_wk=$1 last;
+}
+```
+
+### Apache
+
+Try the standard WordPress rewrite first. If endpoints still return 404, use the `__kp_wk` fallback instead.
+
+**Standard:**
+```apache
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/\.well-known/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+```
+
+**Fallback (if standard does not work):**
+```apache
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/\.well-known/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(/.*)$ /index.php?__kp_wk=$1 [L,QSA]
+</IfModule>
+```
+
+### IIS (web.config)
+
+Try the standard WordPress rewrite first. If endpoints still return 404, use the `__kp_wk` fallback instead.
+
+**Standard:**
+```xml
+<rule name="WellKnown" stopProcessing="true">
+    <match url="^\.well-known/(.*)" />
+    <conditions>
+        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+    </conditions>
+    <action type="Rewrite" url="index.php" />
+</rule>
+```
+
+**Fallback (if standard does not work):**
+```xml
+<rule name="WellKnownFallback" stopProcessing="true">
+    <match url="^\.well-known/(.*)" />
+    <conditions>
+        <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+    </conditions>
+    <action type="Rewrite" url="index.php?__kp_wk=/{R:0}" />
+</rule>
+```
+
+---
+
 ## Configuration
 
 After activation, an **Agent Ready** menu item appears in the WordPress admin sidebar. It has the following tabs, each also available as a direct submenu link.

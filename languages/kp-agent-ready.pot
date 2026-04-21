@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-21T16:28:59+02:00\n"
+"POT-Creation-Date: 2026-04-21T17:02:05+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kp-agent-ready\n"
@@ -50,643 +50,647 @@ msgstr ""
 msgid "Agent Ready"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:167
-#: src/Settings/SettingsPage.php:217
-msgid "Features"
-msgstr ""
-
-#: src/Settings/SettingsPage.php:168
-#: src/Settings/SettingsPage.php:287
-msgid "API Catalog"
-msgstr ""
-
-#: src/Settings/SettingsPage.php:169
-#: src/Settings/SettingsPage.php:361
-msgid "Agent Skills"
+#: src/Settings/SettingsPage.php:147
+msgid "Save Your Settings"
 msgstr ""
 
 #: src/Settings/SettingsPage.php:170
-#: src/Settings/SettingsPage.php:514
+#: src/Settings/SettingsPage.php:220
+msgid "Features"
+msgstr ""
+
+#: src/Settings/SettingsPage.php:171
+#: src/Settings/SettingsPage.php:290
+msgid "API Catalog"
+msgstr ""
+
+#: src/Settings/SettingsPage.php:172
+#: src/Settings/SettingsPage.php:364
+msgid "Agent Skills"
+msgstr ""
+
+#: src/Settings/SettingsPage.php:173
+#: src/Settings/SettingsPage.php:517
 msgid "MCP Server Card"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:175
-#: src/Settings/SettingsPage.php:232
-#: src/Settings/SettingsPage.php:460
+#: src/Settings/SettingsPage.php:178
+#: src/Settings/SettingsPage.php:235
+#: src/Settings/SettingsPage.php:463
 msgid "Content Signals"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:178
-#: src/Settings/SettingsPage.php:592
+#: src/Settings/SettingsPage.php:181
+#: src/Settings/SettingsPage.php:595
 msgid "OAuth / OIDC"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:181
-#: src/Settings/SettingsPage.php:738
+#: src/Settings/SettingsPage.php:184
+#: src/Settings/SettingsPage.php:741
 msgid "OAuth Resource"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:184
-#: src/Settings/SettingsPage.php:246
-#: src/Settings/SettingsPage.php:832
+#: src/Settings/SettingsPage.php:187
+#: src/Settings/SettingsPage.php:249
+#: src/Settings/SettingsPage.php:835
 msgid "WebMCP"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:220
+#: src/Settings/SettingsPage.php:223
 msgid "Feature Toggles"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:225
+#: src/Settings/SettingsPage.php:228
 msgid "RFC 8288 Link Headers"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:226
+#: src/Settings/SettingsPage.php:229
 msgid "Send Link response headers for agent discovery"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:233
+#: src/Settings/SettingsPage.php:236
 msgid "Append Content-Signal directives to robots.txt"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:239
+#: src/Settings/SettingsPage.php:242
 msgid "Markdown Negotiation"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:240
+#: src/Settings/SettingsPage.php:243
 msgid "Serve text/markdown when requested via Accept header"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:247
+#: src/Settings/SettingsPage.php:250
 msgid "Inject WebMCP tool definitions via navigator.modelContext"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:253
+#: src/Settings/SettingsPage.php:256
 msgid "OAuth / OIDC Discovery"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:254
+#: src/Settings/SettingsPage.php:257
 msgid "Serve OAuth or OpenID Connect discovery metadata"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:260
+#: src/Settings/SettingsPage.php:263
 msgid "OAuth Protected Resource"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:261
+#: src/Settings/SettingsPage.php:264
 msgid "Serve OAuth Protected Resource Metadata (RFC 9728)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:290
+#: src/Settings/SettingsPage.php:293
 msgid "Linkset Entries"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:291
+#: src/Settings/SettingsPage.php:294
 msgid "Each entry is published in the <code>linkset</code> array at <code>/.well-known/api-catalog</code> (<a href=\"https://www.rfc-editor.org/rfc/rfc9727\" target=\"_blank\">RFC 9727</a>). Leave empty to use the auto-generated fallback."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:296
+#: src/Settings/SettingsPage.php:299
 msgid "Entries"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:297
+#: src/Settings/SettingsPage.php:300
 msgid "Add Entry"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:300
+#: src/Settings/SettingsPage.php:303
 msgid "Entry"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:305
+#: src/Settings/SettingsPage.php:308
 msgid "Anchor URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:306
+#: src/Settings/SettingsPage.php:309
 msgid "Base URL of the API this entry describes."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:313
+#: src/Settings/SettingsPage.php:316
 msgid "service-desc (OpenAPI spec URL)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:314
+#: src/Settings/SettingsPage.php:317
 msgid "Direct URL to the OpenAPI / Swagger specification file."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:320
+#: src/Settings/SettingsPage.php:323
 msgid "service-doc (Documentation URL)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:321
+#: src/Settings/SettingsPage.php:324
 msgid "Human-readable API documentation page."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:326
+#: src/Settings/SettingsPage.php:329
 msgid "service-doc — or select a page"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:327
-#: src/Settings/SettingsPage.php:423
+#: src/Settings/SettingsPage.php:330
+#: src/Settings/SettingsPage.php:426
 msgid "Overrides the URL above if a page is selected."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:332
+#: src/Settings/SettingsPage.php:335
 msgid "status (Health endpoint URL)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:364
+#: src/Settings/SettingsPage.php:367
 msgid "Blog / Articles"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:369
+#: src/Settings/SettingsPage.php:372
 msgid "Include Blog Articles"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:370
+#: src/Settings/SettingsPage.php:373
 msgid "Expose blog search and article listing as agent skills"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:377
-#: src/Settings/SettingsPage.php:383
+#: src/Settings/SettingsPage.php:380
+#: src/Settings/SettingsPage.php:386
 msgid "Custom Skills"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:378
+#: src/Settings/SettingsPage.php:381
 msgid "Manually define additional entries in the agent skills index."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:384
+#: src/Settings/SettingsPage.php:387
 msgid "Add Skill"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:387
+#: src/Settings/SettingsPage.php:390
 msgid "Skill"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:392
+#: src/Settings/SettingsPage.php:395
 msgid "Name"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:398
+#: src/Settings/SettingsPage.php:401
 msgid "Type"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:400
+#: src/Settings/SettingsPage.php:403
 msgid "Browse"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:401
+#: src/Settings/SettingsPage.php:404
 msgid "Search"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:402
+#: src/Settings/SettingsPage.php:405
 msgid "Form"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:403
+#: src/Settings/SettingsPage.php:406
 msgid "Action"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:404
+#: src/Settings/SettingsPage.php:407
 msgid "API"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:411
-#: src/Settings/SettingsPage.php:535
+#: src/Settings/SettingsPage.php:414
+#: src/Settings/SettingsPage.php:538
 msgid "Description"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:417
+#: src/Settings/SettingsPage.php:420
 msgid "URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:422
+#: src/Settings/SettingsPage.php:425
 msgid "Or select a page"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:428
+#: src/Settings/SettingsPage.php:431
 msgid "sha256 Digest"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:429
+#: src/Settings/SettingsPage.php:432
 msgid "Optional. Hash of the skill file content per the Agent Skills RFC."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:456
+#: src/Settings/SettingsPage.php:459
 msgid "Yes"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:456
+#: src/Settings/SettingsPage.php:459
 msgid "No"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:463
+#: src/Settings/SettingsPage.php:466
 msgid "AI Usage Preferences"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:464
+#: src/Settings/SettingsPage.php:467
 msgid "Declare AI content usage preferences published in <code>robots.txt</code> via the <a href=\"https://contentsignals.org/\" target=\"_blank\">Content Signals</a> spec."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:469
+#: src/Settings/SettingsPage.php:472
 msgid "AI Training (ai-train)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:470
+#: src/Settings/SettingsPage.php:473
 msgid "Allow this content to be used to train AI models."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:477
+#: src/Settings/SettingsPage.php:480
 msgid "Search Indexing (search)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:478
+#: src/Settings/SettingsPage.php:481
 msgid "Allow this content to be indexed by search engines."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:485
+#: src/Settings/SettingsPage.php:488
 msgid "AI RAG Input (ai-input)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:486
+#: src/Settings/SettingsPage.php:489
 msgid "Allow this content to be used as input to AI retrieval / RAG systems."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:517
+#: src/Settings/SettingsPage.php:520
 msgid "Server Card Info"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:518
+#: src/Settings/SettingsPage.php:521
 msgid "Configures <code>/.well-known/mcp/server-card.json</code> per <a href=\"https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127\" target=\"_blank\">SEP-1649</a>."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:523
+#: src/Settings/SettingsPage.php:526
 msgid "Server Name"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:529
+#: src/Settings/SettingsPage.php:532
 msgid "Version"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:530
+#: src/Settings/SettingsPage.php:533
 msgid "1.0.0"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:542
+#: src/Settings/SettingsPage.php:545
 msgid "Transport Endpoint URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:543
+#: src/Settings/SettingsPage.php:546
 msgid "Leave blank if no MCP server is currently running."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:549
-#: src/Settings/SettingsPage.php:555
+#: src/Settings/SettingsPage.php:552
+#: src/Settings/SettingsPage.php:558
 msgid "Capabilities"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:550
+#: src/Settings/SettingsPage.php:553
 msgid "Declare which MCP capabilities this server supports. Each entry adds a key to the <code>capabilities</code> object."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:556
+#: src/Settings/SettingsPage.php:559
 msgid "Add Capability"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:557
+#: src/Settings/SettingsPage.php:560
 msgid "Capability"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:562
+#: src/Settings/SettingsPage.php:565
 msgid "Capability Key"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:563
+#: src/Settings/SettingsPage.php:566
 msgid "e.g. tools, resources, prompts"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:595
+#: src/Settings/SettingsPage.php:598
 msgid "Discovery Type"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:596
+#: src/Settings/SettingsPage.php:599
 msgid "Enable the OAuth / OIDC feature toggle in the Features tab to activate these endpoints."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:601
+#: src/Settings/SettingsPage.php:604
 msgid "Protocol"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:602
+#: src/Settings/SettingsPage.php:605
 msgid "Determines which <code>/.well-known/</code> path is served."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:604
+#: src/Settings/SettingsPage.php:607
 msgid "OpenID Connect — <code>/.well-known/openid-configuration</code>"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:605
+#: src/Settings/SettingsPage.php:608
 msgid "OAuth 2.0 only — <code>/.well-known/oauth-authorization-server</code>"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:612
+#: src/Settings/SettingsPage.php:615
 msgid "Endpoints"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:617
+#: src/Settings/SettingsPage.php:620
 msgid "Issuer"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:618
+#: src/Settings/SettingsPage.php:621
 msgid "The canonical issuer identifier URL."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:624
+#: src/Settings/SettingsPage.php:627
 msgid "Authorization Endpoint"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:630
+#: src/Settings/SettingsPage.php:633
 msgid "Token Endpoint"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:636
+#: src/Settings/SettingsPage.php:639
 msgid "JWKS URI"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:642
+#: src/Settings/SettingsPage.php:645
 msgid "Supported Grant Types"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:647
+#: src/Settings/SettingsPage.php:650
 msgid "Grant Types Supported"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:649
+#: src/Settings/SettingsPage.php:652
 msgid "Auth. Code"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:650
+#: src/Settings/SettingsPage.php:653
 msgid "Client Credentials"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:651
+#: src/Settings/SettingsPage.php:654
 msgid "Refresh Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:652
+#: src/Settings/SettingsPage.php:655
 msgid "Implicit"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:653
+#: src/Settings/SettingsPage.php:656
 msgid "Password"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:654
+#: src/Settings/SettingsPage.php:657
 msgid "Device Code"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:660
+#: src/Settings/SettingsPage.php:663
 msgid "Supported Response Types"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:665
+#: src/Settings/SettingsPage.php:668
 msgid "Response Types Supported"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:667
+#: src/Settings/SettingsPage.php:670
 msgid "Code"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:668
+#: src/Settings/SettingsPage.php:671
 msgid "Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:669
+#: src/Settings/SettingsPage.php:672
 msgid "ID token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:670
+#: src/Settings/SettingsPage.php:673
 msgid "Code Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:671
+#: src/Settings/SettingsPage.php:674
 msgid "Code ID Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:672
+#: src/Settings/SettingsPage.php:675
 msgid "Token ID Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:673
+#: src/Settings/SettingsPage.php:676
 msgid "Code Token ID Token"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:679
+#: src/Settings/SettingsPage.php:682
 msgid "Token Endpoint Auth Methods"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:684
+#: src/Settings/SettingsPage.php:687
 msgid "Endpoint Auth Methods"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:686
+#: src/Settings/SettingsPage.php:689
 msgid "Client Secret Basic"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:687
+#: src/Settings/SettingsPage.php:690
 msgid "Client Secret Post"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:688
+#: src/Settings/SettingsPage.php:691
 msgid "Client Secret JWT"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:689
+#: src/Settings/SettingsPage.php:692
 msgid "Private Key JWT"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:690
+#: src/Settings/SettingsPage.php:693
 msgid "none (PKCE)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:696
-#: src/Settings/SettingsPage.php:791
+#: src/Settings/SettingsPage.php:699
+#: src/Settings/SettingsPage.php:794
 msgid "Supported Scopes"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:697
+#: src/Settings/SettingsPage.php:700
 msgid "Each entry adds a scope string to <code>scopes_supported</code>."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:702
-#: src/Settings/SettingsPage.php:797
+#: src/Settings/SettingsPage.php:705
+#: src/Settings/SettingsPage.php:800
 msgid "Scopes"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:703
-#: src/Settings/SettingsPage.php:798
+#: src/Settings/SettingsPage.php:706
+#: src/Settings/SettingsPage.php:801
 msgid "Add Scope"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:704
-#: src/Settings/SettingsPage.php:709
-#: src/Settings/SettingsPage.php:799
-#: src/Settings/SettingsPage.php:804
+#: src/Settings/SettingsPage.php:707
+#: src/Settings/SettingsPage.php:712
+#: src/Settings/SettingsPage.php:802
+#: src/Settings/SettingsPage.php:807
 msgid "Scope"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:710
+#: src/Settings/SettingsPage.php:713
 msgid "e.g. openid, profile, email, read:posts"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:741
+#: src/Settings/SettingsPage.php:744
 msgid "Protected Resource Metadata"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:742
+#: src/Settings/SettingsPage.php:745
 msgid "Configures <code>/.well-known/oauth-protected-resource</code> per <a href=\"https://www.rfc-editor.org/rfc/rfc9728\" target=\"_blank\">RFC 9728</a>. Enable via the Features tab."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:747
+#: src/Settings/SettingsPage.php:750
 msgid "Resource Identifier"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:748
+#: src/Settings/SettingsPage.php:751
 msgid "Canonical URL identifying this protected resource."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:754
-#: src/Settings/SettingsPage.php:760
+#: src/Settings/SettingsPage.php:757
+#: src/Settings/SettingsPage.php:763
 msgid "Authorization Servers"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:755
+#: src/Settings/SettingsPage.php:758
 msgid "OAuth/OIDC issuer URLs that can issue tokens for this resource."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:761
+#: src/Settings/SettingsPage.php:764
 msgid "Add Server"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:762
+#: src/Settings/SettingsPage.php:765
 msgid "Server"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:767
+#: src/Settings/SettingsPage.php:770
 msgid "Issuer URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:776
+#: src/Settings/SettingsPage.php:779
 msgid "Bearer Methods"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:781
+#: src/Settings/SettingsPage.php:784
 msgid "Bearer Methods Supported"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:783
+#: src/Settings/SettingsPage.php:786
 msgid "header (Authorization: Bearer)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:784
+#: src/Settings/SettingsPage.php:787
 msgid "body (form parameter)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:785
+#: src/Settings/SettingsPage.php:788
 msgid "query (URL parameter)"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:792
+#: src/Settings/SettingsPage.php:795
 msgid "Scopes this resource accepts. Each entry adds a scope string to <code>scopes_supported</code>."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:805
+#: src/Settings/SettingsPage.php:808
 msgid "e.g. read:posts, write:comments"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:835
+#: src/Settings/SettingsPage.php:838
 msgid "Built-in Tools"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:836
+#: src/Settings/SettingsPage.php:839
 msgid "Configure which tools are exposed to agents via <code>navigator.modelContext</code>. Requires the WebMCP feature toggle to be enabled."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:841
+#: src/Settings/SettingsPage.php:844
 msgid "Blog Search"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:842
+#: src/Settings/SettingsPage.php:845
 msgid "Enable the blog search tool"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:849
+#: src/Settings/SettingsPage.php:852
 msgid "Search Tool Description"
 msgstr ""
 
 #. translators: %s is the site name
-#: src/Settings/SettingsPage.php:851
+#: src/Settings/SettingsPage.php:854
 #, php-format
 msgid "Search %s"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:861
+#: src/Settings/SettingsPage.php:864
 msgid "Portfolio Navigation"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:862
+#: src/Settings/SettingsPage.php:865
 msgid "Enable the portfolio navigation tool"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:869
+#: src/Settings/SettingsPage.php:872
 msgid "Portfolio Tool Description"
 msgstr ""
 
 #. translators: %s is the site name
-#: src/Settings/SettingsPage.php:871
+#: src/Settings/SettingsPage.php:874
 #, php-format
 msgid "Browse the portfolio on %s"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:877
+#: src/Settings/SettingsPage.php:880
 msgid "Portfolio URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:888
+#: src/Settings/SettingsPage.php:891
 msgid "Contact Navigation"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:889
+#: src/Settings/SettingsPage.php:892
 msgid "Enable the contact navigation tool"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:896
+#: src/Settings/SettingsPage.php:899
 msgid "Contact Tool Description"
 msgstr ""
 
 #. translators: %s is the site name
-#: src/Settings/SettingsPage.php:898
+#: src/Settings/SettingsPage.php:901
 #, php-format
 msgid "Contact %s"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:904
+#: src/Settings/SettingsPage.php:907
 msgid "Contact URL"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:942
-#: src/Settings/SettingsPage.php:955
+#: src/Settings/SettingsPage.php:945
+#: src/Settings/SettingsPage.php:958
 msgid "Custom Post Types"
 msgstr ""
 
-#: src/Settings/SettingsPage.php:948
+#: src/Settings/SettingsPage.php:951
 msgid "No custom post types are currently registered (other than built-ins)."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:956
+#: src/Settings/SettingsPage.php:959
 msgid "Each checked CPT generates a browsable skill entry pointing to its archive URL."
 msgstr ""
 
-#: src/Settings/SettingsPage.php:961
+#: src/Settings/SettingsPage.php:964
 msgid "Enabled CPTs"
 msgstr ""
 

@@ -143,6 +143,9 @@ class SettingsPage
             'position'           => 30,
             'show_export_import' => true,
             'tabs'               => $tabs,
+            'tab_layout'         => 'vertical',
+            'save_button'        => __('Save Your Settings', 'kp-agent-ready'),
+            'autoload'           => true,
         ];
     }
 
@@ -957,7 +960,7 @@ class SettingsPage
             'fields'      => [
                 [
                     'id'      => 'skill_cpts',
-                    'type'    => 'checkboxes',
+                    'type'    => 'multiselect',
                     'label'   => __('Enabled CPTs', 'kp-agent-ready'),
                     'options' => $opts,
                 ],

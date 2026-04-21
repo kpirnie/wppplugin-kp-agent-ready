@@ -271,7 +271,7 @@ class WellKnown extends AbstractModule
             'capabilities' => $capabilities,
             'description'  => $this->opt('mcp_desc', get_bloginfo('description')),
             'homepage'     => home_url('/'),
-            'contact'      => home_url('/contact/'),
+            'contact'      => $this->opt('webmcp_contact_url', home_url('/contact/')),
         ];
 
         $this->respond($payload);

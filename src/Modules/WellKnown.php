@@ -302,7 +302,7 @@ class WellKnown extends AbstractModule
             exit;
         }
 
-        $this->respond($this->buildOauthPayload());
+        $this->respond($this->buildOauthPayload(), 'application/json', false);
     }
 
     /**
@@ -326,7 +326,7 @@ class WellKnown extends AbstractModule
             exit;
         }
 
-        $this->respond($this->buildOauthPayload());
+        $this->respond($this->buildOauthPayload(), 'application/json', false);
     }
 
     /**
@@ -375,7 +375,7 @@ class WellKnown extends AbstractModule
             'bearer_methods_supported' => $bearer_methods ?: null,
         ]);
 
-        $this->respond($payload);
+        $this->respond($payload, 'application/json', false);
     }
 
     /**
@@ -463,7 +463,7 @@ class WellKnown extends AbstractModule
             $skills[] = [
                 'name'        => sanitize_title($post_type),
                 'type'        => 'browse',
-                'description' => sprintf('Browse %s on %s.', strtolower($obj->label), home_url()),
+                'description' => sprintf('Browse %s on %s.', sanitize_text_field(strtolower($obj->label)), home_url()),
                 'url'         => $archive ?: home_url("/?post_type={$post_type}"),
             ];
         }
@@ -516,7 +516,7 @@ class WellKnown extends AbstractModule
      * @return never Emits response and exits
      *
      */
-    private function respond(array $payload, string $content_type = 'application/json'): never
+    private function respond(array $payload, string $content_type = 'application/json', bool $cache = true): never
     {
         // setup the json response
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -528,7 +528,7 @@ class WellKnown extends AbstractModule
         // Raw PHP headers — intentionally bypassing WordPress header functions
         http_response_code(200);
         header("Content-Type: {$content_type}; charset=UTF-8");
-        header('Cache-Control: public, max-age=3600');
+        header($cache ? 'Cache-Control: public, max-age=3600' : 'Cache-Control: no-store');
         header('X-Robots-Tag: noindex');
 
         // echo our json return and exit

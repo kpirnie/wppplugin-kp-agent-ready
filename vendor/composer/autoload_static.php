@@ -35,6 +35,7 @@ class ComposerStaticInit06da1e886e8d2fae8c455e5a896b6b84
         'KP\\AgentReady\\Modules\\WebMCP' => __DIR__ . '/../..' . '/src/Modules/WebMCP.php',
         'KP\\AgentReady\\Modules\\WellKnown' => __DIR__ . '/../..' . '/src/Modules/WellKnown.php',
         'KP\\AgentReady\\Plugin' => __DIR__ . '/../..' . '/src/Plugin.php',
+        'KP\\AgentReady\\ServerRules' => __DIR__ . '/../..' . '/src/ServerRules.php',
         'KP\\AgentReady\\Settings\\SettingsPage' => __DIR__ . '/../..' . '/src/Settings/SettingsPage.php',
         'KP\\AgentReady\\Updater' => __DIR__ . '/../..' . '/src/Updater.php',
         'KP\\WPFieldFramework\\BlockGenerator' => __DIR__ . '/..' . '/kevinpirnie/kpt-wpfieldframework/src/BlockGenerator.php',

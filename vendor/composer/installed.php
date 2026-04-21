@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'kevinpirnie/wppplugin-kp-agent-ready',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '7224ccb07cfafda65e9444e99425b5fe1d2bbcdd',
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => 'e54112cadc3303226377789aabf7cb75aa78719e',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'kevinpirnie/wppplugin-kp-agent-ready' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '7224ccb07cfafda65e9444e99425b5fe1d2bbcdd',
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => 'e54112cadc3303226377789aabf7cb75aa78719e',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

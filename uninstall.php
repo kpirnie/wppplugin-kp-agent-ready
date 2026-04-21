@@ -25,5 +25,8 @@ if (
 // remove our settings
 unregister_setting('kp_agent_ready', 'kp_agent_ready');
 
-// delete the option
+// delete the options and transients
 delete_option('kp_agent_ready');
+delete_option('kp_agent_ready_server_rules');
+delete_option('kp_agent_ready_nginx_notice_dismissed');
+delete_transient('kp_agent_ready_update_data');

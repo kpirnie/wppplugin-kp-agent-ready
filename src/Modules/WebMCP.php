@@ -179,7 +179,7 @@ class WebMCP extends AbstractModule
             };
         } else {
             execute = function () {
-                if ( tool.url ) {
+                if ( tool.url && /^https?:\/\//i.test( tool.url ) ) {
                     window.location.href = tool.url;
                 }
             };

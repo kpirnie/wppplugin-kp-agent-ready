@@ -4,7 +4,7 @@ Tags: ai, agents, mcp, well-known, markdown
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.22
+Stable tag: 1.1.23
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -177,6 +177,9 @@ Yes — see the Developer Filters section in the Description tab.
 1. The Agent Ready admin menu
 
 == Changelog ==
+
+= 1.1.23 =
+* Update: Escape output for network activation notice
 
 = 1.1.22 =
 * Initial public release.

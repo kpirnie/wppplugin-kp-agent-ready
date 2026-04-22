@@ -75,6 +75,9 @@ class SettingsPage
         // Priority 20 — after CPTs from other plugins are registered at 10
         add_action('init',       [$this, 'init'], 20);
         add_action('admin_menu', [$this, 'registerSubmenus'], 20);
+
+        // enqueue the regenerate button action
+        add_action('admin_footer', [$this, 'enqueueLlmsScript']);
     }
 
     /**
@@ -123,6 +126,9 @@ class SettingsPage
         // make sure they are enabled to pull them in
         if ($this->options['content_signals_enabled'] ?? true) {
             $tabs['content_signals'] = $this->tabContentSignals();
+        }
+        if ($this->options['llms_enabled'] ?? false) {
+            $tabs['llms'] = $this->tabLlms();
         }
         if ($this->options['oauth_enabled'] ?? false) {
             $tabs['oauth'] = $this->tabOAuth();
@@ -176,6 +182,9 @@ class SettingsPage
         // make sure they are enabled
         if ($this->options['content_signals_enabled'] ?? true) {
             $tabs['content_signals'] = __('Content Signals', 'kp-agent-ready');
+        }
+        if ($this->options['llms_enabled'] ?? false) {
+            $tabs['llms'] = __('LLMS', 'kp-agent-ready');
         }
         if ($this->options['oauth_enabled'] ?? false) {
             $tabs['oauth'] = __('OAuth / OIDC', 'kp-agent-ready');
@@ -235,6 +244,13 @@ class SettingsPage
                             'label'          => __('Content Signals', 'kp-agent-ready'),
                             'checkbox_label' => __('Append Content-Signal directives to robots.txt', 'kp-agent-ready'),
                             'default'        => true,
+                        ],
+                        [
+                            'id'             => 'llms_enabled',
+                            'type'           => 'switch',
+                            'label'          => __('LLMS', 'kp-agent-ready'),
+                            'checkbox_label' => __('Generate /llms.txt and /llms-full.txt for AI crawlers', 'kp-agent-ready'),
+                            'default'        => false,
                         ],
                         [
                             'id'             => 'markdown_enabled',
@@ -915,6 +931,170 @@ class SettingsPage
     }
 
     /**
+     * tabLlms
+     *
+     * Builds the llms.txt settings tab — controls for generated file content,
+     * included post types, excerpt length, custom sections, and a manual
+     * regenerate action.
+     *
+     * @since 1.2.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
+    /**
+     * tabLlms
+     *
+     * Builds the llms.txt settings tab — controls for generated file content,
+     * included post types, excerpt length, optional links, and a manual
+     * regenerate action.
+     *
+     * @since 1.2.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return array<string, mixed> The tab configuration array
+     *
+     */
+    private function tabLlms(): array
+    {
+        $all_cpts = get_post_types(['public' => true], 'objects');
+        $cpt_opts = [];
+        foreach ($all_cpts as $slug => $obj) {
+            if (in_array($slug, self::EXCLUDED_CPTS, true)) continue;
+            if (in_array($slug, ['post', 'page'], true)) continue;
+            $cpt_opts[$slug] = $obj->label;
+        }
+
+        // Last-generated timestamp
+        $last = \KP\AgentReady\Modules\LlmsTxt::getLastModified();
+
+        return [
+            'title'    => __('llms.txt', 'kp-agent-ready'),
+            'sections' => [
+                'llms_status' => [
+                    'title'  => __('File Status', 'kp-agent-ready'),
+                    'fields' => [
+                        [
+                            'id'           => 'llms_last_generated',
+                            'type'         => 'message',
+                            'message_type' => 'info',
+                            // translators: %s is a date/time string or em-dash
+                            'content'      => sprintf(__('Last generated: %s', 'kp-agent-ready'), '<strong>' . esc_html($last) . '</strong>'),
+                        ],
+                        [
+                            'id'      => 'llms_regenerate_btn',
+                            'type'    => 'html',
+                            'content' => sprintf(
+                                '<button type="button" class="button button-secondary" id="kp-llms-regenerate" data-nonce="%s" data-action="%s">%s</button>
+								 <span id="kp-llms-regen-status" style="margin-left:10px;font-style:italic;"></span>',
+                                wp_create_nonce('kp_agent_ready_regenerate_llms'),
+                                'kp_agent_ready_regenerate_llms',
+                                esc_html__('Regenerate Now', 'kp-agent-ready')
+                            ),
+                        ],
+                    ],
+                ],
+                'llms_content' => [
+                    'title'  => __('Content', 'kp-agent-ready'),
+                    'fields' => [
+                        [
+                            'id'       => 'llms_intro',
+                            'type'     => 'textarea',
+                            'label'    => __('Intro / Description', 'kp-agent-ready'),
+                            'sublabel' => __('Optional plain-text paragraph appended after the site tagline.', 'kp-agent-ready'),
+                            'rows'     => 4,
+                        ],
+                        [
+                            'id'             => 'llms_include_pages',
+                            'type'           => 'switch',
+                            'label'          => __('Include Pages', 'kp-agent-ready'),
+                            'checkbox_label' => __('Include published WordPress pages', 'kp-agent-ready'),
+                            'default'        => true,
+                        ],
+                        [
+                            'id'             => 'llms_include_posts',
+                            'type'           => 'switch',
+                            'label'          => __('Include Blog Posts', 'kp-agent-ready'),
+                            'checkbox_label' => __('Include published blog posts', 'kp-agent-ready'),
+                            'default'        => true,
+                        ],
+                        [
+                            'id'       => 'llms_excerpt_words',
+                            'type'     => 'number',
+                            'label'    => __('Excerpt Word Limit', 'kp-agent-ready'),
+                            'sublabel' => __('Maximum words pulled from post content when no manual excerpt is set. Used in llms-full.txt.', 'kp-agent-ready'),
+                            'default'  => 200,
+                            'min'      => 10,
+                            'max'      => 1000,
+                            'step'     => 10,
+                        ],
+                    ],
+                ],
+                'llms_cpts' => empty($cpt_opts) ? [
+                    'title'  => __('Custom Post Types', 'kp-agent-ready'),
+                    'fields' => [
+                        [
+                            'id'           => 'llms_no_cpts_notice',
+                            'type'         => 'message',
+                            'message_type' => 'info',
+                            'content'      => __('No custom post types are currently registered (other than built-ins).', 'kp-agent-ready'),
+                        ],
+                    ],
+                ] : [
+                    'title'       => __('Custom Post Types', 'kp-agent-ready'),
+                    'description' => __('Select which CPTs to include as sections in the generated files.', 'kp-agent-ready'),
+                    'fields'      => [
+                        [
+                            'id'      => 'llms_cpts',
+                            'type'    => 'multiselect',
+                            'label'   => __('Enabled CPTs', 'kp-agent-ready'),
+                            'options' => $cpt_opts,
+                        ],
+                    ],
+                ],
+                'llms_optional' => [
+                    'title'       => __('Optional Links', 'kp-agent-ready'),
+                    'description' => __('Additional links published under an <code>## Optional</code> section in both generated files.', 'kp-agent-ready'),
+                    'fields'      => [
+                        [
+                            'id'           => 'llms_custom_links',
+                            'type'         => 'repeater',
+                            'label'        => __('Optional Links', 'kp-agent-ready'),
+                            'button_label' => __('Add Link', 'kp-agent-ready'),
+                            'collapsed'    => false,
+                            'sortable'     => true,
+                            'row_label'    => __('Link', 'kp-agent-ready'),
+                            'fields'       => [
+                                [
+                                    'id'       => 'label',
+                                    'type'     => 'text',
+                                    'label'    => __('Label', 'kp-agent-ready'),
+                                    'required' => true,
+                                ],
+                                [
+                                    'id'    => 'url',
+                                    'type'  => 'url',
+                                    'label' => __('URL', 'kp-agent-ready'),
+                                ],
+                                [
+                                    'id'    => 'description',
+                                    'type'  => 'text',
+                                    'label' => __('Description', 'kp-agent-ready'),
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * buildCptSection
      *
      * Dynamically builds the Custom Post Types settings section from all
@@ -966,5 +1146,48 @@ class SettingsPage
                 ],
             ],
         ];
+    }
+
+    /**
+     * enqueueLlmsScript
+     *
+     * Injects the regenerate button jQuery handler into the admin footer,
+     * scoped to the plugin settings page only.
+     *
+     * @since 1.2.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
+    public function enqueueLlmsScript(): void
+    {
+        $screen = get_current_screen();
+        if (! $screen || strpos($screen->id, Plugin::OPTION_KEY) === false) {
+            return;
+        }
+?>
+        <script>
+            jQuery(function($) {
+                $('#kp-llms-regenerate').on('click', function() {
+                    var $btn = $(this),
+                        $status = $('#kp-llms-regen-status');
+                    $btn.prop('disabled', true);
+                    $status.text('<?php echo esc_js(__('Regenerating…', 'kp-agent-ready')); ?>');
+                    $.post(ajaxurl, {
+                        action: $(this).data('action'),
+                        nonce: $(this).data('nonce')
+                    }, function(res) {
+                        $btn.prop('disabled', false);
+                        $status.text('');
+                        var type = res.success ? 'success' : 'error';
+                        $('.wrap h1').after('<div class="notice notice-' + type + ' is-dismissible"><p>' + res.data.message + '</p></div>');
+                    });
+                });
+            });
+        </script>
+<?php
     }
 }

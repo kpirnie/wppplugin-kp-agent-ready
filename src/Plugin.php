@@ -24,6 +24,7 @@ use KP\AgentReady\Modules\RobotsTxt;
 use KP\AgentReady\Modules\WebMCP;
 use KP\AgentReady\Modules\WellKnown;
 use KP\AgentReady\Settings\SettingsPage;
+use KP\AgentReady\Modules\LlmsTxt;
 
 /**
  * Plugin
@@ -103,6 +104,7 @@ final class Plugin
         (new WellKnown($this->options))->register();
         (new MarkdownNegotiation($this->options))->register();
         (new WebMCP($this->options))->register();
+        (new LlmsTxt($this->options))->register();
     }
 
     /**

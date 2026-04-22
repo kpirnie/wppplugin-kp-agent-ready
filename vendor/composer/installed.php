@@ -3,7 +3,7 @@
         'name' => 'kevinpirnie/wppplugin-kp-agent-ready',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'd9dfc05d7bc84db73259c7b84df5c3aab6283c1e',
+        'reference' => '3d203c576a36897efd4fd8a05ea7a4ac1f4f39db',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'kevinpirnie/wppplugin-kp-agent-ready' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'd9dfc05d7bc84db73259c7b84df5c3aab6283c1e',
+            'reference' => '3d203c576a36897efd4fd8a05ea7a4ac1f4f39db',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

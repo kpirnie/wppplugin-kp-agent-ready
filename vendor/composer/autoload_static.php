@@ -30,6 +30,7 @@ class ComposerStaticInit06da1e886e8d2fae8c455e5a896b6b84
         'KP\\AgentReady\\Helpers\\HtmlToMarkdown' => __DIR__ . '/../..' . '/src/Helpers/HtmlToMarkdown.php',
         'KP\\AgentReady\\Modules\\AbstractModule' => __DIR__ . '/../..' . '/src/Modules/AbstractModule.php',
         'KP\\AgentReady\\Modules\\LinkHeaders' => __DIR__ . '/../..' . '/src/Modules/LinkHeaders.php',
+        'KP\\AgentReady\\Modules\\LlmsTxt' => __DIR__ . '/../..' . '/src/Modules/LlmsTxt.php',
         'KP\\AgentReady\\Modules\\MarkdownNegotiation' => __DIR__ . '/../..' . '/src/Modules/MarkdownNegotiation.php',
         'KP\\AgentReady\\Modules\\RobotsTxt' => __DIR__ . '/../..' . '/src/Modules/RobotsTxt.php',
         'KP\\AgentReady\\Modules\\WebMCP' => __DIR__ . '/../..' . '/src/Modules/WebMCP.php',

@@ -10,6 +10,7 @@ return array(
     'KP\\AgentReady\\Helpers\\HtmlToMarkdown' => $baseDir . '/src/Helpers/HtmlToMarkdown.php',
     'KP\\AgentReady\\Modules\\AbstractModule' => $baseDir . '/src/Modules/AbstractModule.php',
     'KP\\AgentReady\\Modules\\LinkHeaders' => $baseDir . '/src/Modules/LinkHeaders.php',
+    'KP\\AgentReady\\Modules\\LlmsTxt' => $baseDir . '/src/Modules/LlmsTxt.php',
     'KP\\AgentReady\\Modules\\MarkdownNegotiation' => $baseDir . '/src/Modules/MarkdownNegotiation.php',
     'KP\\AgentReady\\Modules\\RobotsTxt' => $baseDir . '/src/Modules/RobotsTxt.php',
     'KP\\AgentReady\\Modules\\WebMCP' => $baseDir . '/src/Modules/WebMCP.php',

@@ -30,3 +30,6 @@ delete_option('kp_agent_ready');
 delete_option('kp_agent_ready_server_rules');
 delete_option('kp_agent_ready_nginx_notice_dismissed');
 delete_transient('kp_agent_ready_update_data');
+
+// remove the generated llms files if they exist
+// KP\AgentReady\Modules\LlmsTxt::deleteFiles();

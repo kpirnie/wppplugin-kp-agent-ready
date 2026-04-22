@@ -127,30 +127,31 @@ class WellKnown extends AbstractModule
      */
     private function resolveRequestPath(): string
     {
-        // this is a workaround because some servers cannot pass through
-        // the request_uri without intervention
-        $uri = $_GET['__kp_wk'] ?? $_SERVER['REQUEST_URI'] ?? '';
-        if ($uri === '') {
+
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        if (isset($_GET['__kp_wk'])) {
+            $raw = sanitize_text_field(wp_unslash($_GET['__kp_wk']));
+        } else {
+            $raw = sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'] ?? ''));
+        }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+        // check our paths
+        if ($raw === '') {
             return '';
         }
-
-        // sanitize and parsel the url
-        $uri  = sanitize_text_field(wp_unslash($uri));
-        $path = parse_url($uri, PHP_URL_PATH);
+        $path = wp_parse_url($raw, PHP_URL_PATH);
         if (! is_string($path) || $path === '') {
             return '';
         }
 
-        // fix the path
-        $home_path = trim((string) parse_url(home_url('/'), PHP_URL_PATH), '/');
+        $home_path = trim((string) wp_parse_url(home_url('/'), PHP_URL_PATH), '/');
         $path      = ltrim($path, '/');
 
-        // now clean out the home path
         if ($home_path !== '' && str_starts_with($path, $home_path . '/')) {
             $path = substr($path, strlen($home_path) + 1);
         }
 
-        // return it
         return $path;
     }
 
@@ -532,7 +533,7 @@ class WellKnown extends AbstractModule
         header('X-Robots-Tag: noindex');
 
         // echo our json return and exit
-        echo $json;
+        echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         exit;
     }
 }

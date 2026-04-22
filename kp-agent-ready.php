@@ -4,10 +4,11 @@
  * Plugin Name:  KP Agent Ready
  * Plugin URI:   https://github.com/kpirnie/wppplugin-kp-agent-ready
  * Description:  Make your WordPress site discoverable and usable by AI agents. Implements the emerging suite of agent-readiness standards — all configurable from the WordPress admin.
- * Version:      1.1.21
+ * Version:      1.1.22
  * Author:       Kevin Pirnie
- * Author URI:   https://kevinpirnie.com
- * License:      MIT
+ * Author URI:   https://kevinpirnie.com/
+ * License:      GPL-2.0-or-later
+ * License URI:  https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:  kp-agent-ready
  * Requires PHP: 8.2
  * Requires at least: 6.8
@@ -17,7 +18,7 @@
 defined('ABSPATH') || die('No direct script access allowed');
 
 // setup our plugin definitions
-defined('KP_AGENT_READY_VERSION') || define('KP_AGENT_READY_VERSION', '1.1.21');
+defined('KP_AGENT_READY_VERSION') || define('KP_AGENT_READY_VERSION', '1.1.22');
 defined('KP_AGENT_READY_FILE') || define('KP_AGENT_READY_FILE',    __FILE__);
 defined('KP_AGENT_READY_DIR') || define('KP_AGENT_READY_DIR',     plugin_dir_path(__FILE__));
 defined('KP_AGENT_READY_URL') || define('KP_AGENT_READY_URL',     plugin_dir_url(__FILE__));
@@ -44,3 +45,11 @@ add_action('plugins_loaded', [KP\AgentReady\Plugin::class, 'instance']);
 // make sure to register our activation and deactivation too
 register_activation_hook(__FILE__, [KP\AgentReady\Plugin::class, 'activate']);
 register_deactivation_hook(__FILE__, [KP\AgentReady\Plugin::class, 'deactivate']);
+
+// Prevent activation on multisite network
+defined('WPMU_PLUGIN_DIR') && add_action('admin_init', static function () {
+    if (is_plugin_active_for_network(plugin_basename(__FILE__))) {
+        deactivate_plugins(plugin_basename(__FILE__));
+        wp_die(esc_html__('KP Agent Ready cannot be network activated. Please activate it on individual sites only.', 'kp-agent-ready'));
+    }
+});

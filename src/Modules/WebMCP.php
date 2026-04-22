@@ -112,7 +112,8 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'search_blog',
                 'type'        => 'search',
-                'description' => __($this->opt('webmcp_search_desc', sprintf('Search %s', $site_name)), 'kp-agent-ready'),
+                // translators: %s is the site name
+                'description' => $this->opt('webmcp_search_desc', sprintf(__('Search %s', 'kp-agent-ready'), $site_name)),
                 'url' => home_url('/?s={query}'),
                 'inputSchema' => [
                     'type'       => 'object',
@@ -126,7 +127,8 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'go_to_portfolio',
                 'type'        => 'navigate',
-                'description' => __($this->opt('webmcp_portfolio_desc', sprintf('Browse the portfolio on %s', $site_name)), 'kp-agent-ready'),
+                // translators: %s is the site name
+                'description' => $this->opt('webmcp_portfolio_desc', sprintf(__('Browse the portfolio on %s', 'kp-agent-ready'), $site_name)),
                 'url'         => esc_url_raw($this->opt('webmcp_portfolio_url', home_url('/portfolio/'))),
                 'inputSchema' => ['type' => 'object', 'properties' => (object) [], 'required' => []],
             ];
@@ -136,7 +138,8 @@ class WebMCP extends AbstractModule
             $tools[] = [
                 'name'        => 'go_to_contact',
                 'type'        => 'navigate',
-                'description' => __($this->opt('webmcp_contact_desc', sprintf('Contact %s', $site_name)), 'kp-agent-ready'),
+                // translators: %s is the site name
+                'description' => $this->opt('webmcp_contact_desc', sprintf(__('Contact %s', 'kp-agent-ready'), $site_name)),
                 'url'         => esc_url_raw($this->opt('webmcp_contact_url', home_url('/contact/'))),
                 'inputSchema' => ['type' => 'object', 'properties' => (object) [], 'required' => []],
             ];
@@ -165,17 +168,16 @@ class WebMCP extends AbstractModule
      */
     private function getScript(): string
     {
-        return <<<JS
-( function () {
-    if ( ! navigator.modelContext || typeof navigator.modelContext.provideContext !== 'function' ) return;
+        return '( function () {
+    if ( ! navigator.modelContext || typeof navigator.modelContext.provideContext !== \'function\' ) return;
     if ( ! window.kpWebMcp || ! Array.isArray( window.kpWebMcp.tools ) || ! window.kpWebMcp.tools.length ) return;
 
     var tools = window.kpWebMcp.tools.map( function ( tool ) {
         var execute;
 
-        if ( tool.type === 'search' ) {
+        if ( tool.type === \'search\' ) {
             execute = function ( input ) {
-                window.location.href = window.kpWebMcp.homeUrl + '/?s=' + encodeURIComponent( ( input && input.query ) ? input.query : '' );
+                window.location.href = window.kpWebMcp.homeUrl + \'/?s=\' + encodeURIComponent( ( input && input.query ) ? input.query : \'\' );
             };
         } else {
             execute = function () {
@@ -194,7 +196,6 @@ class WebMCP extends AbstractModule
     } );
 
     navigator.modelContext.provideContext( { tools : tools } );
-} )();
-JS;
+} )();';
     }
 }

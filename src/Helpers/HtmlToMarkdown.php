@@ -730,7 +730,7 @@ class HtmlToMarkdown
     private static function cleanCell(string $text): string
     {
         // Replace pipes inside cells to avoid breaking the table structure
-        return str_replace('|', '&#124;', trim(preg_replace('/\s+/u', ' ', strip_tags($text))));
+        return str_replace('|', '&#124;', trim(preg_replace('/\s+/u', ' ', wp_strip_all_tags($text))));
     }
 
     /**

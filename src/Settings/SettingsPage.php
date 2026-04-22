@@ -1093,7 +1093,7 @@ class SettingsPage
         }
 
         echo '</div>';
-        echo '<div class="kp-ar-field-input">' . $content . '</div>';
+        echo '<div class="kp-ar-field-input">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo '</div>';
     }
 
@@ -1452,8 +1452,12 @@ class SettingsPage
                 case 'select':
                     echo '<select id="' . esc_attr($ffid) . '" name="' . esc_attr($fname) . '" class="widefat">';
                     foreach ($field['options'] ?? [] as $oval => $olabel) {
-                        $sel = (string) $fval === (string) $oval ? ' selected' : '';
-                        printf('<option value="%s"%s>%s</option>', esc_attr((string) $oval), $sel, esc_html($olabel));
+                        printf(
+                            '<option value="%s"%s>%s</option>',
+                            esc_attr((string) $oval),
+                            selected((string) $fval, (string) $oval, false),
+                            esc_html($olabel)
+                        );
                     }
                     echo '</select>';
                     break;
@@ -1554,26 +1558,27 @@ class SettingsPage
      */
     private function getAdminJs(): string
     {
-        return <<<JS
+
+        return '
 (function () {
-    'use strict';
+    \'use strict\';
 
     /**
      * Add a new row by cloning the hidden <template> and replacing __INDEX__.
      */
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.kp-ar-add-row');
+    document.addEventListener(\'click\', function (e) {
+        var btn = e.target.closest(\'.kp-ar-add-row\');
         if (!btn) { return; }
 
         var repeaterId = btn.dataset.repeater;
-        var repeater   = btn.closest('.kp-ar-repeater');
-        var tpl        = repeater ? repeater.querySelector('template.kp-ar-row-tpl') : null;
-        var rows       = repeater ? repeater.querySelector('.kp-ar-repeater-rows')   : null;
+        var repeater   = btn.closest(\'.kp-ar-repeater\');
+        var tpl        = repeater ? repeater.querySelector(\'template.kp-ar-row-tpl\') : null;
+        var rows       = repeater ? repeater.querySelector(\'.kp-ar-repeater-rows\')   : null;
         if (!tpl || !rows) { return; }
 
-        var count = rows.querySelectorAll('.kp-ar-repeater-row').length;
+        var count = rows.querySelectorAll(\'.kp-ar-repeater-row\').length;
         var html  = tpl.innerHTML.replace(/__INDEX__/g, String(count));
-        var wrap  = document.createElement('div');
+        var wrap  = document.createElement(\'div\');
         wrap.innerHTML = html;
 
         var newRow = wrap.firstElementChild;
@@ -1588,12 +1593,12 @@ class SettingsPage
     /**
      * Remove the clicked row and reindex remaining rows.
      */
-    document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.kp-ar-remove-row');
+    document.addEventListener(\'click\', function (e) {
+        var btn = e.target.closest(\'.kp-ar-remove-row\');
         if (!btn) { return; }
 
-        var row  = btn.closest('.kp-ar-repeater-row');
-        var rows = row ? row.closest('.kp-ar-repeater-rows') : null;
+        var row  = btn.closest(\'.kp-ar-repeater-row\');
+        var rows = row ? row.closest(\'.kp-ar-repeater-rows\') : null;
         if (!row || !rows) { return; }
 
         row.remove();
@@ -1607,8 +1612,8 @@ class SettingsPage
      * @param {HTMLElement} rows The .kp-ar-repeater-rows container
      */
     function refreshRowNumbers(rows) {
-        rows.querySelectorAll('.kp-ar-repeater-row').forEach(function (row, i) {
-            var num = row.querySelector('.kp-ar-row-num');
+        rows.querySelectorAll(\'.kp-ar-repeater-row\').forEach(function (row, i) {
+            var num = row.querySelector(\'.kp-ar-row-num\');
             if (num) { num.textContent = String(i + 1); }
         });
     }
@@ -1617,22 +1622,17 @@ class SettingsPage
      * Reindexes field name attributes after a row is removed so that
      * the submitted array has contiguous numeric keys.
      *
-     * Name format: option_key[repeater_id][ROW_INDEX][field_id]
-     * The regex targets the second bracket group (the row index).
-     *
      * @param {HTMLElement} rows The .kp-ar-repeater-rows container
      */
     function reindexRows(rows) {
-        rows.querySelectorAll('.kp-ar-repeater-row').forEach(function (row, newIndex) {
+        rows.querySelectorAll(\'.kp-ar-repeater-row\').forEach(function (row, newIndex) {
             var oldIndex = row.dataset.rowIndex;
 
             if (oldIndex !== undefined && oldIndex !== String(newIndex)) {
-                row.querySelectorAll('[name]').forEach(function (el) {
-                    // Replace option_key[repeater_id][OLD][field_id]
-                    //                                    ^^^
+                row.querySelectorAll(\'[name]\').forEach(function (el) {
                     el.name = el.name.replace(
                         /^([^\[]+\[[^\]]+\])\[\d+\]/,
-                        '$1[' + newIndex + ']'
+                        \'$1[\' + newIndex + \']\'
                     );
                 });
             }
@@ -1641,7 +1641,7 @@ class SettingsPage
         });
     }
 })();
-JS;
+';
     }
 
     // =========================================================================

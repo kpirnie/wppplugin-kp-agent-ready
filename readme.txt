@@ -2,13 +2,13 @@
 Contributors: kevp75
 Tags: ai, agents, mcp, well-known, markdown
 Requires at least: 6.8
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.21
-License: MIT
-License URI: https://opensource.org/licenses/MIT
+Stable tag: 1.1.22
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Make your WordPress site discoverable and usable by AI agents. Implements the emerging suite of agent-readiness standards — all configurable from the WordPress admin.
+Make your WordPress site discoverable and usable by AI agents via well-known endpoints, MCP, OAuth, and Markdown negotiation.
 
 == Description ==
 
@@ -178,6 +178,6 @@ Yes — see the Developer Filters section in the Description tab.
 
 == Changelog ==
 
-= 1.0.68 =
+= 1.1.22 =
 * Initial public release.
 * RFC 8288 Link headers, API catalog, agent skills index, MCP server card, OAuth/OIDC discovery, OAuth protected resource, Content Signals robots.txt directives, Markdown negotiation, and WebMCP built-in tools.

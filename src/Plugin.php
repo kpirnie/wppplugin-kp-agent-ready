@@ -94,7 +94,6 @@ final class Plugin
         // if we're in the admin
         if (is_admin()) {
             (new SettingsPage($this->options))->register();
-            (new Updater())->register();
         }
 
         // fire up the modules

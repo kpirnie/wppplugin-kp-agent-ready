@@ -16,7 +16,6 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: kp-agent-ready.php
-#: src/Updater.php:137
 msgid "KP Agent Ready"
 msgstr ""
 
@@ -32,7 +31,6 @@ msgstr ""
 
 #. Author of the plugin
 #: kp-agent-ready.php
-#: src/Updater.php:140
 msgid "Kevin Pirnie"
 msgstr ""
 
@@ -692,8 +690,4 @@ msgstr ""
 
 #: src/Settings/SettingsPage.php:964
 msgid "Enabled CPTs"
-msgstr ""
-
-#: src/Updater.php:146
-msgid "Make your WordPress site discoverable and usable by AI agents."
 msgstr ""

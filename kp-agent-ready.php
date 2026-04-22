@@ -22,10 +22,21 @@ defined('KP_AGENT_READY_FILE') || define('KP_AGENT_READY_FILE',    __FILE__);
 defined('KP_AGENT_READY_DIR') || define('KP_AGENT_READY_DIR',     plugin_dir_path(__FILE__));
 defined('KP_AGENT_READY_URL') || define('KP_AGENT_READY_URL',     plugin_dir_url(__FILE__));
 
-// make sure the autoloader is required, but only if it exists
-if (file_exists(KP_AGENT_READY_DIR . 'vendor/autoload.php')) {
-    require_once KP_AGENT_READY_DIR . 'vendor/autoload.php';
-}
+// Simple PSR-4 autoloader for KP\AgentReady\
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'KP\\AgentReady\\';
+    $len    = strlen($prefix);
+
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+
+    $file = KP_AGENT_READY_DIR . 'src/' . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $len)) . '.php';
+
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
 
 // add our plugin in the proper wordpress action
 add_action('plugins_loaded', [KP\AgentReady\Plugin::class, 'instance']);

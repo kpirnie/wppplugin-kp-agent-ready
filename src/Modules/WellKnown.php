@@ -12,7 +12,7 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady\Modules;
+namespace KPAgentReady\Modules;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -220,7 +220,7 @@ class WellKnown extends AbstractModule
      * serveAgentSkills
      *
      * Serves /.well-known/agent-skills/index.json per Agent Skills Discovery v0.2.0.
-     * Applies the kp_agent_skills filter before output.
+     * Applies the kpagre_agent_skills filter before output.
      *
      * @since 1.0.0
      * @access private
@@ -232,7 +232,7 @@ class WellKnown extends AbstractModule
      */
     private function serveAgentSkills(): never
     {
-        $skills = (array) apply_filters('kp_agent_skills', $this->buildSkills());
+        $skills = (array) apply_filters('kpagre_agent_skills', $this->buildSkills());
 
         $payload = [
             '$schema' => 'https://agentskills.io/schema/v0.2.0/index.schema.json',
@@ -276,7 +276,7 @@ class WellKnown extends AbstractModule
             'capabilities' => $capabilities,
             'description'  => sanitize_text_field($this->opt('mcp_desc', get_bloginfo('description'))),
             'homepage'     => esc_url_raw(home_url('/')),
-            'contact'      => $this->opt('webmcp_contact_url', home_url('/contact/')),
+            'contact'      => esc_url_raw($this->opt('webmcp_contact_url', home_url('/contact/'))),
         ];
 
         $this->respond($payload);
@@ -445,13 +445,15 @@ class WellKnown extends AbstractModule
             $skills[] = [
                 'name'        => 'blog-search',
                 'type'        => 'search',
-                'description' => sprintf('Search %s blog articles.', $site_name),
+                // translators: %s is the site name
+                'description' => sprintf(__('Search %s blog articles.', 'kp-agent-ready'), $site_name),
                 'url'         => home_url('/?s={query}'),
             ];
             $skills[] = [
                 'name'        => 'blog-articles',
                 'type'        => 'browse',
-                'description' => sprintf('Browse all blog articles published on %s.', home_url()),
+                // translators: %s is the site URL
+                'description' => sprintf(__('Browse all blog articles published on %s.', 'kp-agent-ready'), home_url()),
                 'url'         => esc_url_raw($blog_url),
             ];
         }
@@ -464,7 +466,8 @@ class WellKnown extends AbstractModule
             $skills[] = [
                 'name'        => sanitize_title($post_type),
                 'type'        => 'browse',
-                'description' => sprintf('Browse %s on %s.', sanitize_text_field(strtolower($obj->label)), home_url()),
+                // translators: %1$s is the post type label, %2$s is the site URL
+                'description' => sprintf(__('Browse %1$s on %2$s.', 'kp-agent-ready'), sanitize_text_field(strtolower($obj->label)), home_url()),
                 'url'         => $archive ?: home_url("/?post_type={$post_type}"),
             ];
         }
@@ -520,7 +523,7 @@ class WellKnown extends AbstractModule
     private function respond(array $payload, string $content_type = 'application/json', bool $cache = true): never
     {
         // setup the json response
-        $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $json = wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         if ($json === false) {
             http_response_code(500);
             exit;

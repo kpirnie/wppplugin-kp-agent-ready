@@ -14,13 +14,13 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady\Modules;
+namespace KPAgentReady\Modules;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
 
 // pull in the namespace
-use KP\AgentReady\Helpers\HtmlToMarkdown;
+use KPAgentReady\Helpers\HtmlToMarkdown;
 
 /**
  * MarkdownNegotiation

@@ -21,7 +21,7 @@
 declare(strict_types=1);
 
 // Setup the namespace
-namespace KP\AgentReady\Helpers;
+namespace KPAgentReady\Helpers;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');

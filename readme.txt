@@ -4,7 +4,7 @@ Tags: ai, agents, mcp, well-known, markdown
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.23
+Stable tag: 1.1.24
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -59,9 +59,9 @@ Injects a small JavaScript snippet into your page footer that calls `navigator.m
 
 Two filters let themes and other plugins extend the plugin's output without touching settings:
 
-`kp_agent_skills` — add entries to the agent skills index:
+`kpagre_agent_skills` — add entries to the agent skills index:
 
-    add_filter( 'kp_agent_skills', function ( array $skills ): array {
+    add_filter( 'kpagre_agent_skills', function ( array $skills ): array {
         $skills[] = [
             'name'        => 'my-skill',
             'type'        => 'api',
@@ -71,9 +71,9 @@ Two filters let themes and other plugins extend the plugin's output without touc
         return $skills;
     } );
 
-`kp_webmcp_tools` — add tools to the WebMCP context:
+`kpagre_webmcp_tools` — add tools to the WebMCP context:
 
-    add_filter( 'kp_webmcp_tools', function ( array $tools ): array {
+    add_filter( 'kpagre_webmcp_tools', function ( array $tools ): array {
         // $tools is the PHP array that becomes the JS tools array
         return $tools;
     } );
@@ -177,6 +177,15 @@ Yes — see the Developer Filters section in the Description tab.
 1. The Agent Ready admin menu
 
 == Changelog ==
+
+= 1.1.24 =
+* Fix: Renamed all plugin defines, namespaces, filters, and JS object references from short `kp` prefix to `kpagre` to meet WordPress.org prefix length requirements
+* Fix: Replaced `json_encode()` with `wp_json_encode()` in WellKnown respond()
+* Fix: Replaced phpcs:ignore suppression in fieldRow() with proper `wp_kses()` escaping for constructed form HTML
+* Fix: Externalized inline admin CSS and JS to physical asset files to resolve output escaping review flags
+* Fix: Wrapped missing `sprintf()` description strings in `__()` for i18n compliance in WellKnown buildSkills()
+* Fix: Added `esc_url_raw()` to MCP server card contact field output in WellKnown serveMcpCard()
+* Fix: Removed stale `delete_option()` calls in uninstall.php for options that no longer exist
 
 = 1.1.23 =
 * Update: Escape output for network activation notice

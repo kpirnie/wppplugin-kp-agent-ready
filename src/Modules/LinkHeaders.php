@@ -13,7 +13,7 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady\Modules;
+namespace KPAgentReady\Modules;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');

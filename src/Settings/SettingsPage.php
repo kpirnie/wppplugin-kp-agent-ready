@@ -14,13 +14,13 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady\Settings;
+namespace KPAgentReady\Settings;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
 
 // pull in our namespace
-use KP\AgentReady\Plugin;
+use KPAgentReady\Plugin;
 
 /**
  * SettingsPage
@@ -253,13 +253,20 @@ class SettingsPage
             return;
         }
 
-        // Attach CSS to the always-loaded wp-admin handle
-        wp_add_inline_style('wp-admin', $this->getAdminCss());
+        wp_enqueue_style(
+            'kp-agent-ready-admin',
+            KPAGRE_URL . 'assets/admin.css',
+            ['wp-admin'],
+            KPAGRE_VERSION
+        );
 
-        // Register a virtual script handle and attach our repeater JS inline
-        wp_register_script('kp-agent-ready-admin', false, [], KP_AGENT_READY_VERSION, ['in_footer' => true]);
-        wp_enqueue_script('kp-agent-ready-admin');
-        wp_add_inline_script('kp-agent-ready-admin', $this->getAdminJs());
+        wp_enqueue_script(
+            'kp-agent-ready-admin',
+            KPAGRE_URL . 'assets/admin.js',
+            [],
+            KPAGRE_VERSION,
+            ['in_footer' => true]
+        );
     }
 
     // =========================================================================
@@ -1084,6 +1091,19 @@ class SettingsPage
     {
         $html_id = Plugin::OPTION_KEY . '_' . $id;
 
+        // Allowed tags for constructed form field HTML
+        $allowed = [
+            'input'    => ['type' => true, 'id' => true, 'name' => true, 'value' => true, 'placeholder' => true, 'class' => true, 'checked' => true, 'required' => true, 'rows' => true, 'aria-label' => true],
+            'select'   => ['id' => true, 'name' => true, 'class' => true],
+            'option'   => ['value' => true, 'selected' => true],
+            'textarea' => ['id' => true, 'name' => true, 'rows' => true, 'class' => true],
+            'fieldset' => [],
+            'label'    => ['for' => true, 'class' => true],
+            'span'     => ['class' => true, 'aria-hidden' => true],
+            'strong'   => [],
+            'br'       => [],
+        ];
+
         echo '<div class="kp-ar-field">';
         echo '<div class="kp-ar-field-label">';
         printf('<label for="%s">%s</label>', esc_attr($html_id), esc_html($label));
@@ -1093,7 +1113,7 @@ class SettingsPage
         }
 
         echo '</div>';
-        echo '<div class="kp-ar-field-input">' . $content . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo '<div class="kp-ar-field-input">' . wp_kses($content, $allowed) . '</div>';
         echo '</div>';
     }
 
@@ -1477,171 +1497,6 @@ class SettingsPage
 
         echo '</div>'; // .kp-ar-row-fields
         echo '</div>'; // .kp-ar-repeater-row
-    }
-
-    // =========================================================================
-    // Assets
-    // =========================================================================
-
-    /**
-     * getAdminCss
-     *
-     * Returns the inline CSS string for the settings page UI.
-     *
-     * @since 1.0.0
-     * @access private
-     * @author Kevin Pirnie <iam@kevinpirnie.com>
-     * @package KP Agent Ready
-     *
-     * @return string CSS string
-     *
-     */
-    private function getAdminCss(): string
-    {
-        return '
-            .kp-ar-layout{display:flex;gap:20px;align-items:flex-start;margin-top:20px}
-            .kp-ar-tab-nav{display:flex;flex-direction:column;gap:2px;min-width:185px;flex-shrink:0;background:#f0f0f1;border:1px solid #c3c4c7;border-radius:3px;padding:5px}
-            .kp-ar-tab{display:block;padding:10px 14px;text-decoration:none;background:transparent;color:#2271b1;border-radius:2px;transition:background .15s}
-            .kp-ar-tab:hover{background:rgba(255,255,255,.55)}
-            .kp-ar-tab.active{background:#fff;color:#000;font-weight:600;box-shadow:0 1px 1px rgba(0,0,0,.04)}
-            .kp-ar-tab-content{flex:1;background:#fff;border:1px solid #c3c4c7;border-radius:3px;padding:20px}
-            .kp-ar-section{margin-bottom:28px}
-            .kp-ar-section-title{font-size:1.05em;border-bottom:1px solid #ddd;padding-bottom:8px;margin-bottom:12px}
-            .kp-ar-section-desc{margin-bottom:14px}
-            .kp-ar-field{display:flex;gap:16px;margin-bottom:14px;align-items:flex-start}
-            .kp-ar-field-label{flex:0 0 220px;padding-top:4px}
-            .kp-ar-field-label label{font-weight:600;display:block}
-            .kp-ar-field-input{flex:1}
-            .kp-ar-sublabel{display:block;font-size:12px;color:#646970;margin-top:3px}
-            .kp-ar-switch{position:relative;display:inline-block;width:46px;height:24px;vertical-align:middle}
-            .kp-ar-switch input{opacity:0;width:0;height:0}
-            .kp-ar-slider{position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:.2s}
-            .kp-ar-slider:before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
-            .kp-ar-switch input:checked+.kp-ar-slider{background:#2271b1}
-            .kp-ar-switch input:checked+.kp-ar-slider:before{transform:translateX(22px)}
-            .kp-ar-switch-label{margin-left:8px;vertical-align:middle}
-            .kp-ar-repeater{border:1px solid #ddd;border-radius:3px;background:#f9f9f9}
-            .kp-ar-repeater-rows{padding:10px 10px 0}
-            .kp-ar-repeater-row{background:#fff;border:1px solid #ddd;border-radius:3px;margin-bottom:10px}
-            .kp-ar-row-header{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f6f7f7;border-bottom:1px solid #ddd;border-radius:3px 3px 0 0}
-            .kp-ar-drag-handle{cursor:move;color:#aaa}
-            .kp-ar-row-num{flex:1;font-size:13px}
-            .kp-ar-remove-row{color:#d63638!important;text-decoration:none}
-            .kp-ar-row-fields{display:flex;flex-wrap:wrap;gap:12px;padding:12px}
-            .kp-ar-row-field{flex:1 1 180px;min-width:140px}
-            .kp-ar-row-field label{display:block;font-weight:600;font-size:12px;margin-bottom:4px}
-            .kp-ar-row-field input,.kp-ar-row-field select,.kp-ar-row-field textarea{width:100%!important;box-sizing:border-box}
-            .kp-ar-repeater>.button{margin:10px}
-            @media(max-width:782px){
-                .kp-ar-layout{flex-direction:column}
-                .kp-ar-tab-nav{flex-direction:row;overflow-x:auto;min-width:0;width:100%;flex-wrap:nowrap}
-                .kp-ar-tab{white-space:nowrap}
-                .kp-ar-field{flex-direction:column}
-                .kp-ar-field-label{flex:none}
-            }
-        ';
-    }
-
-    /**
-     * getAdminJs
-     *
-     * Returns the inline JavaScript for the repeater add/remove/reindex logic.
-     * Written in vanilla JS — no jQuery dependency.
-     *
-     * @since 1.0.0
-     * @access private
-     * @author Kevin Pirnie <iam@kevinpirnie.com>
-     * @package KP Agent Ready
-     *
-     * @return string JavaScript string (no <script> wrapper)
-     *
-     */
-    private function getAdminJs(): string
-    {
-
-        return '
-(function () {
-    \'use strict\';
-
-    /**
-     * Add a new row by cloning the hidden <template> and replacing __INDEX__.
-     */
-    document.addEventListener(\'click\', function (e) {
-        var btn = e.target.closest(\'.kp-ar-add-row\');
-        if (!btn) { return; }
-
-        var repeaterId = btn.dataset.repeater;
-        var repeater   = btn.closest(\'.kp-ar-repeater\');
-        var tpl        = repeater ? repeater.querySelector(\'template.kp-ar-row-tpl\') : null;
-        var rows       = repeater ? repeater.querySelector(\'.kp-ar-repeater-rows\')   : null;
-        if (!tpl || !rows) { return; }
-
-        var count = rows.querySelectorAll(\'.kp-ar-repeater-row\').length;
-        var html  = tpl.innerHTML.replace(/__INDEX__/g, String(count));
-        var wrap  = document.createElement(\'div\');
-        wrap.innerHTML = html;
-
-        var newRow = wrap.firstElementChild;
-        if (newRow) {
-            newRow.dataset.rowIndex = count;
-            rows.appendChild(newRow);
-        }
-
-        refreshRowNumbers(rows);
-    });
-
-    /**
-     * Remove the clicked row and reindex remaining rows.
-     */
-    document.addEventListener(\'click\', function (e) {
-        var btn = e.target.closest(\'.kp-ar-remove-row\');
-        if (!btn) { return; }
-
-        var row  = btn.closest(\'.kp-ar-repeater-row\');
-        var rows = row ? row.closest(\'.kp-ar-repeater-rows\') : null;
-        if (!row || !rows) { return; }
-
-        row.remove();
-        reindexRows(rows);
-        refreshRowNumbers(rows);
-    });
-
-    /**
-     * Update the visible ordinal number shown in each row header.
-     *
-     * @param {HTMLElement} rows The .kp-ar-repeater-rows container
-     */
-    function refreshRowNumbers(rows) {
-        rows.querySelectorAll(\'.kp-ar-repeater-row\').forEach(function (row, i) {
-            var num = row.querySelector(\'.kp-ar-row-num\');
-            if (num) { num.textContent = String(i + 1); }
-        });
-    }
-
-    /**
-     * Reindexes field name attributes after a row is removed so that
-     * the submitted array has contiguous numeric keys.
-     *
-     * @param {HTMLElement} rows The .kp-ar-repeater-rows container
-     */
-    function reindexRows(rows) {
-        rows.querySelectorAll(\'.kp-ar-repeater-row\').forEach(function (row, newIndex) {
-            var oldIndex = row.dataset.rowIndex;
-
-            if (oldIndex !== undefined && oldIndex !== String(newIndex)) {
-                row.querySelectorAll(\'[name]\').forEach(function (el) {
-                    el.name = el.name.replace(
-                        /^([^\[]+\[[^\]]+\])\[\d+\]/,
-                        \'$1[\' + newIndex + \']\'
-                    );
-                });
-            }
-
-            row.dataset.rowIndex = newIndex;
-        });
-    }
-})();
-';
     }
 
     // =========================================================================

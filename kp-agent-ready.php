@@ -4,7 +4,7 @@
  * Plugin Name:  KP Agent Ready
  * Plugin URI:   https://github.com/kpirnie/wppplugin-kp-agent-ready
  * Description:  Make your WordPress site discoverable and usable by AI agents. Implements the emerging suite of agent-readiness standards — all configurable from the WordPress admin.
- * Version:      1.1.23
+ * Version:      1.1.24
  * Author:       Kevin Pirnie
  * Author URI:   https://kevinpirnie.com/
  * License:      GPL-2.0-or-later
@@ -18,21 +18,21 @@
 defined('ABSPATH') || die('No direct script access allowed');
 
 // setup our plugin definitions
-defined('KP_AGENT_READY_VERSION') || define('KP_AGENT_READY_VERSION', '1.1.23');
-defined('KP_AGENT_READY_FILE') || define('KP_AGENT_READY_FILE',    __FILE__);
-defined('KP_AGENT_READY_DIR') || define('KP_AGENT_READY_DIR',     plugin_dir_path(__FILE__));
-defined('KP_AGENT_READY_URL') || define('KP_AGENT_READY_URL',     plugin_dir_url(__FILE__));
+defined('KPAGRE_VERSION') || define('KPAGRE_VERSION', '1.1.24');
+defined('KPAGRE_FILE') || define('KPAGRE_FILE',    __FILE__);
+defined('KPAGRE_DIR') || define('KPAGRE_DIR',     plugin_dir_path(__FILE__));
+defined('KPAGRE_URL') || define('KPAGRE_URL',     plugin_dir_url(__FILE__));
 
-// Simple PSR-4 autoloader for KP\AgentReady\
+// Simple PSR-4 autoloader for KPAgentReady\
 spl_autoload_register(static function (string $class): void {
-    $prefix = 'KP\\AgentReady\\';
+    $prefix = 'KPAgentReady\\';
     $len    = strlen($prefix);
 
     if (strncmp($prefix, $class, $len) !== 0) {
         return;
     }
 
-    $file = KP_AGENT_READY_DIR . 'src/' . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $len)) . '.php';
+    $file = KPAGRE_DIR . 'src/' . str_replace('\\', DIRECTORY_SEPARATOR, substr($class, $len)) . '.php';
 
     if (file_exists($file)) {
         require_once $file;
@@ -40,11 +40,11 @@ spl_autoload_register(static function (string $class): void {
 });
 
 // add our plugin in the proper wordpress action
-add_action('plugins_loaded', [KP\AgentReady\Plugin::class, 'instance']);
+add_action('plugins_loaded', [\KPAgentReady\Plugin::class, 'instance']);
 
 // make sure to register our activation and deactivation too
-register_activation_hook(__FILE__, [KP\AgentReady\Plugin::class, 'activate']);
-register_deactivation_hook(__FILE__, [KP\AgentReady\Plugin::class, 'deactivate']);
+register_activation_hook(__FILE__, [\KPAgentReady\Plugin::class, 'activate']);
+register_deactivation_hook(__FILE__, [\KPAgentReady\Plugin::class, 'deactivate']);
 
 // Prevent activation on multisite network
 defined('WPMU_PLUGIN_DIR') && add_action('admin_init', static function () {

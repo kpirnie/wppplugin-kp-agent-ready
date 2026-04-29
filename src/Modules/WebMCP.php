@@ -14,7 +14,7 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady\Modules;
+namespace KPAgentReady\Modules;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
@@ -82,9 +82,9 @@ class WebMCP extends AbstractModule
             return;
         }
 
-        wp_register_script(self::HANDLE, false, [], KP_AGENT_READY_VERSION, ['in_footer' => true]);
+        wp_register_script(self::HANDLE, false, [], KPAGRE_VERSION, ['in_footer' => true]);
         wp_enqueue_script(self::HANDLE);
-        wp_localize_script(self::HANDLE, 'kpWebMcp', $config);
+        wp_localize_script(self::HANDLE, 'kpagreWebMcp', $config);
         wp_add_inline_script(self::HANDLE, $this->getScript());
     }
 
@@ -93,7 +93,7 @@ class WebMCP extends AbstractModule
      *
      * Assembles the tool configuration array passed to wp_localize_script.
      * Each tool carries its name, type, description, url, and inputSchema.
-     * Applies the kp_webmcp_tools filter before returning.
+     * Applies the kpagre_webmcp_tools filter before returning.
      *
      * @since 1.0.0
      * @access private
@@ -147,7 +147,7 @@ class WebMCP extends AbstractModule
 
         return [
             'homeUrl' => home_url(),
-            'tools'   => apply_filters('kp_webmcp_tools', $tools),
+            'tools'   => apply_filters('kpagre_webmcp_tools', $tools),
         ];
     }
 
@@ -155,7 +155,7 @@ class WebMCP extends AbstractModule
      * getScript
      *
      * Returns the WebMCP bootstrap JavaScript string. Reads from the
-     * kpWebMcp global set by wp_localize_script, maps each tool config
+     * kpagreWebMcp global set by wp_localize_script, maps each tool config
      * to an execute function based on its type, and calls provideContext().
      *
      * @since 1.0.0
@@ -170,14 +170,14 @@ class WebMCP extends AbstractModule
     {
         return '( function () {
     if ( ! navigator.modelContext || typeof navigator.modelContext.provideContext !== \'function\' ) return;
-    if ( ! window.kpWebMcp || ! Array.isArray( window.kpWebMcp.tools ) || ! window.kpWebMcp.tools.length ) return;
+    if ( ! window.kpagreWebMcp || ! Array.isArray( window.kpagreWebMcp.tools ) || ! window.kpagreWebMcp.tools.length ) return;
 
-    var tools = window.kpWebMcp.tools.map( function ( tool ) {
+    var tools = window.kpagreWebMcp.tools.map( function ( tool ) {
         var execute;
 
         if ( tool.type === \'search\' ) {
             execute = function ( input ) {
-                window.location.href = window.kpWebMcp.homeUrl + \'/?s=\' + encodeURIComponent( ( input && input.query ) ? input.query : \'\' );
+                window.location.href = window.kpagreWebMcp.homeUrl + \'/?s=\' + encodeURIComponent( ( input && input.query ) ? input.query : \'\' );
             };
         } else {
             execute = function () {

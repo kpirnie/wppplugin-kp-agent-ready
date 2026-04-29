@@ -12,18 +12,18 @@
  */
 
 // setup the namespace
-namespace KP\AgentReady;
+namespace KPAgentReady;
 
 // We don't want to allow direct access to this
 defined('ABSPATH') || die('No direct script access allowed');
 
 // Pull in the rest of our namespaces
-use KP\AgentReady\Modules\LinkHeaders;
-use KP\AgentReady\Modules\MarkdownNegotiation;
-use KP\AgentReady\Modules\RobotsTxt;
-use KP\AgentReady\Modules\WebMCP;
-use KP\AgentReady\Modules\WellKnown;
-use KP\AgentReady\Settings\SettingsPage;
+use KPAgentReady\Modules\LinkHeaders;
+use KPAgentReady\Modules\MarkdownNegotiation;
+use KPAgentReady\Modules\RobotsTxt;
+use KPAgentReady\Modules\WebMCP;
+use KPAgentReady\Modules\WellKnown;
+use KPAgentReady\Settings\SettingsPage;
 
 /**
  * Plugin

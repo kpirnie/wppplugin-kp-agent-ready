@@ -4,7 +4,7 @@ Tags: ai, agents, mcp, well-known, markdown
 Requires at least: 6.8
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.23
+Stable tag: 1.1.37
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -174,12 +174,36 @@ Yes — see the Developer Filters section in the Description tab.
 
 == Screenshots ==
 
-1. The Agent Ready admin menu
+1. Agent Skills Pull
+2. Features Settings
+3. API Catalog
+4. Agent Skills
+5. Content Signals
+6. MCP Server Card
+7. WebMCP
 
 == Changelog ==
 
-= 1.1.23 =
-* Update: Escape output for network activation notice
+= 1.1.47 =
+* Fix: Markdown output
+* Fix: LLMS generation
+
+= 1.1.39 = 
+* Confirm: WordPress Core 7 compliance
+
+= 1.1.37 =
+* Update: Security on some settings
+* New: Screenshots
+* New: LLMS Generator
+
+= 1.1.24 =
+* Fix: Renamed all plugin defines, namespaces, filters, and JS object references from short `kp` prefix to `kpagre` to meet WordPress.org prefix length requirements
+* Fix: Replaced `json_encode()` with `wp_json_encode()` in WellKnown respond()
+* Fix: Replaced phpcs:ignore suppression in fieldRow() with proper `wp_kses()` escaping for constructed form HTML
+* Fix: Externalized inline admin CSS and JS to physical asset files to resolve output escaping review flags
+* Fix: Wrapped missing `sprintf()` description strings in `__()` for i18n compliance in WellKnown buildSkills()
+* Fix: Added `esc_url_raw()` to MCP server card contact field output in WellKnown serveMcpCard()
+* Fix: Removed stale `delete_option()` calls in uninstall.php for options that no longer exist
 
 = 1.1.22 =
 * Initial public release.

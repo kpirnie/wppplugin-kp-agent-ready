@@ -1,10 +1,10 @@
 === KP Agent Ready ===
 Contributors: kevp75
 Tags: ai, agents, mcp, well-known, markdown
-Requires at least: 6.8
+Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.37
+Stable tag: 1.1.47
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -187,6 +187,7 @@ Yes — see the Developer Filters section in the Description tab.
 = 1.1.47 =
 * Fix: Markdown output
 * Fix: LLMS generation
+* Verified: Down to WP Core 6.2
 
 = 1.1.39 = 
 * Confirm: WordPress Core 7 compliance

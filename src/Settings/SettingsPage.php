@@ -63,6 +63,7 @@ class SettingsPage
         'features' => [
             'link_headers_enabled',
             'content_signals_enabled',
+            'llms_enabled',
             'markdown_enabled',
             'webmcp_enabled',
             'oauth_enabled',
@@ -71,6 +72,14 @@ class SettingsPage
         'api_catalog'     => ['api_catalog_entries'],
         'agent_skills'    => ['skill_blog_enabled', 'skill_cpts', 'skill_custom'],
         'content_signals' => ['cs_ai_train', 'cs_search', 'cs_ai_input'],
+        'llms' => [
+            'llms_intro',
+            'llms_include_pages',
+            'llms_include_posts',
+            'llms_excerpt_words',
+            'llms_cpts',
+            'llms_custom_links',
+        ],
         'mcp_card'        => ['mcp_name', 'mcp_version', 'mcp_desc', 'mcp_transport', 'mcp_capabilities'],
         'oauth'           => [
             'oauth_type',
@@ -108,6 +117,9 @@ class SettingsPage
         'webmcp_search',
         'webmcp_portfolio',
         'webmcp_contact',
+        'llms_enabled',
+        'llms_include_pages',
+        'llms_include_posts',
     ];
 
     /** Array fields — default to [] when absent from POST. */
@@ -123,6 +135,8 @@ class SettingsPage
         'opr_auth_servers',
         'opr_bearer_methods',
         'opr_scopes',
+        'llms_cpts',
+        'llms_custom_links',
     ];
 
     /** URL scalar fields — sanitized with esc_url_raw. */
@@ -158,6 +172,9 @@ class SettingsPage
         add_action('admin_menu',             [$this, 'registerMenus'],   20);
         add_action('admin_init',             [$this, 'registerSettings']);
         add_action('admin_enqueue_scripts',  [$this, 'enqueueAssets']);
+        add_action('admin_footer',           [$this, 'enqueueLlmsScript']);
+        add_filter('parent_file',            [$this, 'filterParentFile']);
+        add_filter('submenu_file',           [$this, 'filterSubmenuFile']);
     }
 
     /**
@@ -205,9 +222,16 @@ class SettingsPage
     public function registerSubmenus(): void
     {
         foreach ($this->getEnabledTabs() as $tab => $label) {
-            $url = add_query_arg('tab', $tab, 'admin.php?page=' . Plugin::OPTION_KEY);
-            add_submenu_page(Plugin::OPTION_KEY, $label, $label, 'manage_options', $url);
+            add_submenu_page(
+                Plugin::OPTION_KEY,
+                $label,
+                $label,
+                'manage_options',
+                Plugin::OPTION_KEY . '&tab=' . $tab,
+                '__return_null'
+            );
         }
+        remove_submenu_page(Plugin::OPTION_KEY, Plugin::OPTION_KEY);
     }
 
     /**
@@ -382,8 +406,8 @@ class SettingsPage
             'mcp_capabilities'         => $this->sanitizeMcpCapabilities($value),
             'oauth_scopes', 'opr_scopes' => $this->sanitizeScopes($value),
             'opr_auth_servers'         => $this->sanitizeAuthServers($value),
-            // response types can contain spaces ("code token"), so use sanitize_text_field
             'oauth_response_types'     => array_values(array_filter(array_map('sanitize_text_field', $value))),
+            'llms_custom_links'        => $this->sanitizeLlmsCustomLinks($value),
             default                    => array_values(array_filter(array_map('sanitize_key', $value))),
         };
     }
@@ -578,6 +602,40 @@ class SettingsPage
         return $clean;
     }
 
+    /**
+     * sanitizeLlmsCustomLinks
+     *
+     * Sanitizes the llms.txt optional links repeater rows.
+     *
+     * @since 1.2.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param array $rows Raw repeater rows
+     *
+     * @return array Sanitized rows
+     *
+     */
+    private function sanitizeLlmsCustomLinks(array $rows): array
+    {
+        $clean = [];
+
+        foreach ($rows as $row) {
+            if (!is_array($row) || empty(trim($row['label'] ?? ''))) {
+                continue;
+            }
+
+            $clean[] = [
+                'label'       => sanitize_text_field($row['label']),
+                'url'         => esc_url_raw($row['url'] ?? ''),
+                'description' => sanitize_text_field($row['description'] ?? ''),
+            ];
+        }
+
+        return $clean;
+    }
+
     // =========================================================================
     // Page rendering
     // =========================================================================
@@ -625,7 +683,7 @@ class SettingsPage
             <div class="kp-ar-layout">
                 <nav class="kp-ar-tab-nav" aria-label="<?php esc_attr_e('Settings tabs', 'kp-agent-ready'); ?>">
                     <?php foreach ($tabs as $tab_id => $label): ?>
-                        <a href="<?php echo esc_url(add_query_arg('tab', $tab_id)); ?>"
+                        <a href="<?php echo esc_url(admin_url('admin.php?page=' . Plugin::OPTION_KEY . '&tab=' . $tab_id)); ?>"
                             class="kp-ar-tab<?php echo $current_tab === $tab_id ? ' active' : ''; ?>">
                             <?php echo esc_html($label); ?>
                         </a>
@@ -643,7 +701,7 @@ class SettingsPage
                 </div>
             </div>
         </div>
-<?php
+    <?php
     }
 
     /**
@@ -668,6 +726,7 @@ class SettingsPage
             'api_catalog'     => $this->renderApiCatalogTab(),
             'agent_skills'    => $this->renderAgentSkillsTab(),
             'content_signals' => $this->renderContentSignalsTab(),
+            'llms'            => $this->renderLlmsTab(),
             'mcp_card'        => $this->renderMcpCardTab(),
             'oauth'           => $this->renderOAuthTab(),
             'oauth_resource'  => $this->renderOAuthResourceTab(),
@@ -698,6 +757,7 @@ class SettingsPage
         $this->sectionOpen(__('Feature Toggles', 'kp-agent-ready'));
         $this->fieldSwitch('link_headers_enabled',    __('RFC 8288 Link Headers',   'kp-agent-ready'), __('Send Link response headers for agent discovery',                  'kp-agent-ready'), true);
         $this->fieldSwitch('content_signals_enabled', __('Content Signals',          'kp-agent-ready'), __('Append Content-Signal directives to robots.txt',                 'kp-agent-ready'), true);
+        $this->fieldSwitch('llms_enabled', __('LLMS', 'kp-agent-ready'), __('Generate /llms.txt and /llms-full.txt for AI crawlers', 'kp-agent-ready'), false);
         $this->fieldSwitch('markdown_enabled',        __('Markdown Negotiation',     'kp-agent-ready'), __('Serve text/markdown when requested via Accept header',            'kp-agent-ready'), true);
         $this->fieldSwitch('webmcp_enabled',          __('WebMCP',                   'kp-agent-ready'), __('Inject WebMCP tool definitions via navigator.modelContext',       'kp-agent-ready'), true);
         $this->fieldSwitch('oauth_enabled',           __('OAuth / OIDC Discovery',   'kp-agent-ready'), __('Serve OAuth or OpenID Connect discovery metadata',               'kp-agent-ready'), false);
@@ -1014,6 +1074,76 @@ class SettingsPage
         $this->sectionClose();
     }
 
+    /**
+     * renderLlmsTab
+     *
+     * Renders the llms.txt tab — file status, content controls, CPT selection,
+     * optional links repeater, and a manual regenerate action.
+     *
+     * @since 1.2.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
+    private function renderLlmsTab(): void
+    {
+        $last = \KP\AgentReady\Modules\LlmsTxt::getLastModified();
+
+        $this->sectionOpen(__('File Status', 'kp-agent-ready'));
+        echo '<div class="kp-ar-field">';
+        echo '<div class="kp-ar-field-label"><label>' . esc_html__('Last Generated', 'kp-agent-ready') . '</label></div>';
+        echo '<div class="kp-ar-field-input"><strong>' . esc_html($last) . '</strong></div>';
+        echo '</div>';
+        echo '<div class="kp-ar-field">';
+        echo '<div class="kp-ar-field-label"></div>';
+        echo '<div class="kp-ar-field-input">';
+        printf(
+            '<button type="button" class="button button-secondary" id="kp-llms-regenerate" data-nonce="%s" data-action="kp_agent_ready_regenerate_llms">%s</button> <span id="kp-llms-regen-status" style="font-style:italic;margin-left:8px;"></span>',
+            esc_attr(wp_create_nonce('kp_agent_ready_regenerate_llms')),
+            esc_html__('Regenerate Now', 'kp-agent-ready')
+        );
+        echo '</div></div>';
+        $this->sectionClose();
+
+        $this->sectionOpen(__('Content', 'kp-agent-ready'));
+        $this->fieldTextarea('llms_intro',         __('Intro / Description',  'kp-agent-ready'), 4);
+        $this->fieldSwitch('llms_include_pages',   __('Include Pages',        'kp-agent-ready'), __('Include published WordPress pages', 'kp-agent-ready'), true);
+        $this->fieldSwitch('llms_include_posts',   __('Include Blog Posts',   'kp-agent-ready'), __('Include published blog posts', 'kp-agent-ready'), true);
+        $this->fieldNumber('llms_excerpt_words',   __('Excerpt Word Limit',   'kp-agent-ready'), 200, 10, 1000, 10, __('Maximum words from post content when no manual excerpt is set. Used in llms-full.txt.', 'kp-agent-ready'));
+        $this->sectionClose();
+
+        $all_cpts = get_post_types(['public' => true], 'objects');
+        $cpt_opts = [];
+
+        foreach ($all_cpts as $slug => $obj) {
+            if (in_array($slug, self::EXCLUDED_CPTS, true) || in_array($slug, ['post', 'page'], true)) {
+                continue;
+            }
+            $cpt_opts[$slug] = $obj->label;
+        }
+
+        $this->sectionOpen(__('Custom Post Types', 'kp-agent-ready'), __('Select which CPTs to include as sections in the generated files.', 'kp-agent-ready'));
+
+        if (empty($cpt_opts)) {
+            echo '<p class="description">' . esc_html__('No custom post types are currently registered (other than built-ins).', 'kp-agent-ready') . '</p>';
+        } else {
+            $this->fieldCheckboxes('llms_cpts', __('Enabled CPTs', 'kp-agent-ready'), $cpt_opts);
+        }
+
+        $this->sectionClose();
+
+        $this->sectionOpen(__('Optional Links', 'kp-agent-ready'), __('Additional links published under an <code>## Optional</code> section in both generated files.', 'kp-agent-ready'));
+        $this->fieldRepeater('llms_custom_links', __('Add Link', 'kp-agent-ready'), [
+            ['id' => 'label',       'type' => 'text', 'label' => __('Label',       'kp-agent-ready'), 'required' => true],
+            ['id' => 'url',         'type' => 'url',  'label' => __('URL',         'kp-agent-ready')],
+            ['id' => 'description', 'type' => 'text', 'label' => __('Description', 'kp-agent-ready')],
+        ]);
+        $this->sectionClose();
+    }
+
     // =========================================================================
     // Field helpers
     // =========================================================================
@@ -1233,6 +1363,46 @@ class SettingsPage
         );
 
         $this->fieldRow($id, $label, '', $html);
+    }
+
+    /**
+     * fieldNumber
+     *
+     * Renders a number input field.
+     *
+     * @since 1.2.0
+     * @access private
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $id       Option key
+     * @param string $label    Field label
+     * @param int    $default  Default value
+     * @param int    $min      Minimum value
+     * @param int    $max      Maximum value
+     * @param int    $step     Step increment
+     * @param string $sublabel Optional sub-label
+     *
+     * @return void This method does not return anything
+     *
+     */
+    private function fieldNumber(string $id, string $label, int $default = 0, int $min = 0, int $max = 9999, int $step = 1, string $sublabel = ''): void
+    {
+        $val     = (int) ($this->options[$id] ?? $default);
+        $name    = Plugin::OPTION_KEY . '[' . $id . ']';
+        $html_id = Plugin::OPTION_KEY . '_' . $id;
+
+        $html = sprintf(
+            '<input type="number" id="%s" name="%s" value="%d" min="%d" max="%d" step="%d" class="small-text">',
+            esc_attr($html_id),
+            esc_attr($name),
+            $val,
+            $min,
+            $max,
+            $step
+        );
+
+        $this->fieldRow($id, $label, $sublabel, $html);
     }
 
     /**
@@ -1644,6 +1814,49 @@ class SettingsPage
 ';
     }
 
+    /**
+     * enqueueLlmsScript
+     *
+     * Injects the regenerate button jQuery handler into the admin footer,
+     * scoped to the plugin settings page only.
+     *
+     * @since 1.2.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @return void This method does not return anything
+     *
+     */
+    public function enqueueLlmsScript(): void
+    {
+        $screen = get_current_screen();
+        if (!$screen || strpos($screen->id, Plugin::OPTION_KEY) === false) {
+            return;
+        }
+    ?>
+        <script>
+            jQuery(function($) {
+                $('#kp-llms-regenerate').on('click', function() {
+                    var $btn = $(this),
+                        $status = $('#kp-llms-regen-status');
+                    $btn.prop('disabled', true);
+                    $status.text('<?php echo esc_js(__('Regenerating…', 'kp-agent-ready')); ?>');
+                    $.post(ajaxurl, {
+                        action: $(this).data('action'),
+                        nonce: $(this).data('nonce')
+                    }, function(res) {
+                        $btn.prop('disabled', false);
+                        $status.text('');
+                        var type = res.success ? 'success' : 'error';
+                        $('.wrap h1').after('<div class="notice notice-' + type + ' is-dismissible"><p>' + res.data.message + '</p></div>');
+                    });
+                });
+            });
+        </script>
+<?php
+    }
+
     // =========================================================================
     // Helpers
     // =========================================================================
@@ -1673,6 +1886,10 @@ class SettingsPage
 
         if ($this->options['content_signals_enabled'] ?? true) {
             $tabs['content_signals'] = __('Content Signals', 'kp-agent-ready');
+        }
+
+        if ($this->options['llms_enabled'] ?? false) {
+            $tabs['llms'] = __('LLMS', 'kp-agent-ready');
         }
 
         if ($this->options['oauth_enabled'] ?? false) {
@@ -1713,5 +1930,58 @@ class SettingsPage
         }
 
         return $opts;
+    }
+
+    /**
+     * filterParentFile
+     *
+     * Ensures the Agent Ready top-level menu item stays highlighted
+     * regardless of which tab is active.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $parent_file The current parent file
+     *
+     * @return string The corrected parent file
+     *
+     */
+    public function filterParentFile(?string $parent_file): ?string
+    {
+        $screen = get_current_screen();
+        if ($screen && strpos($screen->id, Plugin::OPTION_KEY) !== false) {
+            return Plugin::OPTION_KEY;
+        }
+        return $parent_file;
+    }
+
+    /**
+     * filterSubmenuFile
+     *
+     * Highlights the correct submenu tab based on the current tab query var.
+     *
+     * @since 1.0.0
+     * @access public
+     * @author Kevin Pirnie <iam@kevinpirnie.com>
+     * @package KP Agent Ready
+     *
+     * @param string $submenu_file The current submenu file
+     *
+     * @return string The corrected submenu file
+     *
+     */
+    public function filterSubmenuFile(?string $submenu_file): ?string
+    {
+        $screen = get_current_screen();
+        if (! $screen || strpos($screen->id, Plugin::OPTION_KEY) === false) {
+            return $submenu_file;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $tab = sanitize_key($_GET['tab'] ?? 'features');
+
+        return Plugin::OPTION_KEY . '&tab=' . $tab;
     }
 }

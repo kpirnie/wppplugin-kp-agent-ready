@@ -4,7 +4,7 @@ Tags: ai, agents, mcp, well-known, markdown
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.1.47
+Stable tag: 1.1.59
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,6 +54,15 @@ When an AI agent sends a request with the `Accept: text/markdown` header, the pl
 
 **WebMCP**
 Injects a small JavaScript snippet into your page footer that calls `navigator.modelContext.provideContext()`, exposing your site's key actions as tools to AI agents running in the browser. Built-in tools include blog search, portfolio navigation, and contact page navigation — each individually toggleable.
+
+**llms.txt and llms-full.txt**
+Generates physical `/llms.txt` and `/llms-full.txt` files in your WordPress web root per the [llmstxt.org](https://llmstxt.org) specification. These files give AI systems a structured, readable index of your site's content — who you are, what pages exist, and what your posts are about.
+
+`llms.txt` contains your site header and a clean list of links by content type. `llms-full.txt` contains the same structure but expands each entry with an excerpt or truncated content block so AI systems can understand the content without fetching every URL.
+
+Files are regenerated automatically when posts are published, unpublished, or trashed, and whenever settings are saved. A manual Regenerate button is available in the llms.txt settings tab. If your host prevents direct file writes, the generated content is displayed in the admin as a copyable textarea so you can create the files manually.
+
+Configurable options include a custom intro block, toggling pages and posts independently, selecting additional custom post types, setting the excerpt word limit for `llms-full.txt`, and defining optional additional links that appear under an `## Optional` section in both files.
 
 = Developer Filters =
 
@@ -181,12 +190,19 @@ Yes — see the Developer Filters section in the Description tab.
 5. Content Signals
 6. MCP Server Card
 7. WebMCP
+8. LLMS
 
 == Changelog ==
 
+= 1.1.59 =
+* Fix: Submenu Highlight
+* Remove: Agent Ready from Submenu
+* Fix: LLMS settings not showing
+* Fix: LLMS generation
+* Fix: Uninstall
+
 = 1.1.47 =
 * Fix: Markdown output
-* Fix: LLMS generation
 * Verified: Down to WP Core 6.2
 
 = 1.1.39 = 

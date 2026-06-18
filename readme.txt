@@ -1,10 +1,10 @@
 === KP Agent Ready ===
 Contributors: kevp75
 Tags: ai, agents, mcp, well-known, markdown
-Requires at least: 6.2
-Tested up to: 7.0
+Requires at least: 6.8
+Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.1.59
+Stable tag: 1.1.88
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -193,6 +193,10 @@ Yes — see the Developer Filters section in the Description tab.
 8. LLMS
 
 == Changelog ==
+
+= 1.1.88 =
+* Update LlmsTxt module: Utilize wp_delete_file instead of unlink on plugin removal
+* Verify: Wordpress Core 7.1 compliant
 
 = 1.1.59 =
 * Fix: Submenu Highlight

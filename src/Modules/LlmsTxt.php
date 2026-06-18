@@ -724,7 +724,7 @@ class LlmsTxt extends AbstractModule
         foreach ([self::FILE_SLIM, self::FILE_FULL] as $file) {
             $path = rtrim(ABSPATH, '/') . '/' . $file;
             if (file_exists($path)) {
-                @unlink($path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                wp_delete_file($path);
             }
         }
 
